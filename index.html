@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>企業防衛提案主意書</title>
+  <style>
+    :root{
+      --border:#222;
+      --grid:#d9dde5;
+      --bg:#eef2f7;
+      --paper:#fff;
+      --soft:#f7f9fc;
+      --soft-2:#f3f4f6;
+      --yellow:#ead43a;
+      --accent:#0b57d0;
+      --text:#111827;
+      --muted:#6b7280;
+      --danger:#9b1c1c;
+    }
+    *{box-sizing:border-box;}
+    body{margin:0;background:var(--bg);font-family:"Hiragino Sans","Yu Gothic","Meiryo",sans-serif;color:var(--text);}
+    .toolbar{
+      position:sticky;top:0;z-index:50;background:#fff;border-bottom:1px solid #d7dde7;
+      padding:12px 14px;display:flex;gap:8px;flex-wrap:wrap;
+    }
+    .toolbar button,.toolbar label.file-btn{
+      appearance:none;border:1px solid #c9d0da;background:#fff;border-radius:10px;
+      padding:10px 14px;font-size:14px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;
+    }
+    .toolbar button.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:700;}
+    .toolbar button.warn{border-color:#d6b04a;background:#fff9e6;}
+    .toolbar input[type="file"]{display:none;}
+    .status{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:8px 10px; border:1px solid #dbe2ea; background:#f8fafc;
+      border-radius:10px; font-size:12px; color:#374151;
+    }
+    .status.hidden{display:none;}
+    .page{
+      width:min(1320px, calc(100vw - 24px));margin:16px auto 40px;background:var(--paper);
+      padding:26px 26px 34px;box-shadow:0 10px 30px rgba(0,0,0,.08);
+    }
+    h1{margin:0 0 14px;text-align:center;font-size:34px;letter-spacing:.08em;}
+    .head-row{display:grid;grid-template-columns:1.1fr 1fr;gap:20px;align-items:start;margin-bottom:16px;}
+    .line-field{display:flex;align-items:flex-end;gap:12px;}
+    .line-field .label{font-size:24px;font-weight:700;white-space:nowrap;}
+    .line-field .line{flex:1;border-bottom:2px solid #4b5563;min-height:38px;display:flex;align-items:flex-end;}
+    input,textarea,select{font:inherit;color:inherit;}
+    .line input,.inline-line input,.inline-line select{width:100%;border:none;outline:none;background:transparent;padding:6px 4px;}
+    .meta-box{padding-top:6px;}
+    .date-row,.person-row{display:flex;justify-content:flex-end;align-items:center;gap:8px;flex-wrap:wrap;font-size:16px;margin:8px 0;}
+    .inline-line{display:inline-flex;align-items:flex-end;min-height:32px;border-bottom:1px solid #4b5563;background:#fff;}
+    .inline-line.year{width:96px;}
+    .inline-line.sm{width:88px;}
+    .inline-line.long{width:180px;}
+    select{
+      width:100%;border:none;outline:none;background:transparent;padding:6px 26px 6px 4px;appearance:none;
+      background-image:linear-gradient(45deg, transparent 50%, #666 50%), linear-gradient(135deg, #666 50%, transparent 50%);
+      background-position:calc(100% - 15px) calc(50% - 2px), calc(100% - 9px) calc(50% - 2px);
+      background-size:6px 6px,6px 6px;background-repeat:no-repeat;
+    }
+    .top-grid{display:grid;grid-template-columns:1fr 1.4fr;gap:18px;align-items:start;margin-bottom:18px;}
+    table{border-collapse:collapse;width:100%;table-layout:fixed;}
+    th,td{border:2px solid var(--border);padding:6px 8px;vertical-align:middle;}
+    th{font-weight:700;text-align:center;background:#fff;}
+    td{min-height:40px;height:40px;}
+    .mini th,.mini td{font-size:14px;min-height:36px;height:36px;}
+    .mini td input,.mini td select{width:100%;border:none;outline:none;background:transparent;padding:4px;}
+    .check-cell{text-align:center;}
+    .check-cell input{transform:scale(1.1);}
+    .purpose-box{border:2px solid var(--border);}
+    .purpose-title{background:var(--yellow);border-bottom:2px solid var(--border);padding:8px 10px;text-align:center;font-size:28px;font-weight:800;}
+    .purpose-body{background:var(--yellow);padding:12px;min-height:200px;}
+    .purpose-body textarea{width:100%;min-height:170px;border:none;outline:none;background:transparent;line-height:1.8;resize:vertical;}
+    .section{margin-top:18px;}
+    .section-title{font-size:24px;font-weight:800;margin:0 0 8px;display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;}
+    .subtext{font-size:12px;color:var(--muted);font-weight:500;}
+    .grid-2{display:grid;grid-template-columns:1.15fr .85fr;gap:16px;}
+    .hint-box{border:1px solid #d8dee8;background:var(--soft);padding:10px 12px;border-radius:10px;font-size:12px;line-height:1.65;color:#374151;margin-top:8px;}
+    .std-table .item{font-weight:700;}
+    .std-table .formula{display:block;color:#374151;font-size:12px;font-weight:500;line-height:1.45;margin-top:2px;}
+    .std-table .sum-row th,.std-table .sum-row td{font-weight:800;background:#fcfcfc;}
+    .std-table .group-row td{background:#f7f7f7;font-weight:800;}
+    .amount-wrap{display:flex;align-items:center;gap:4px;min-height:28px;}
+    .amount-wrap input{flex:1;min-width:0;text-align:right;border:none;outline:none;background:transparent;padding:4px;}
+    .amount-unit{font-size:12px;color:#374151;white-space:nowrap;}
+    .readonly{background:#f8fafc;}
+    .scenario-table th,.scenario-table td{text-align:center;}
+    .scenario-table .row-title{text-align:left;font-weight:700;}
+    .cards{display:grid;grid-template-columns:repeat(5, minmax(120px, 1fr));gap:10px;}
+    .card{border:1px solid #d6dde7;background:#f8fafc;border-radius:12px;padding:10px 12px;}
+    .card .label{font-size:12px;color:var(--muted);margin-bottom:4px;}
+    .card .value{font-size:24px;font-weight:800;line-height:1.1;}
+    .danger{color:var(--danger);}
+    .insurer-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 6px;}
+    .insurer-head .name{font-size:20px;font-weight:800;}
+    .controls{display:flex;gap:8px;flex-wrap:wrap;}
+    .controls button{border:1px solid #cdd5df;background:#fff;border-radius:8px;padding:8px 10px;cursor:pointer;}
+    .gray{background:var(--soft-2);}
+    .black{background:#111;color:#fff;}
+    .center{text-align:center;}
+    .left{text-align:left;}
+    .small{font-size:12px;line-height:1.35;}
+    .tiny{font-size:11px;line-height:1.3;}
+    .note-list{margin-top:8px;font-size:12px;color:#4b5563;line-height:1.65;}
+    .json-area{display:none;}
+    .footer-note{margin-top:14px;font-size:12px;color:#4b5563;line-height:1.7;border:1px solid #d8dee8;background:#fafcff;padding:10px 12px;border-radius:10px;}
+    @media (max-width: 1080px){
+      .head-row,.top-grid,.grid-2{grid-template-columns:1fr;}
+      .cards{grid-template-columns:1fr 1fr;}
+    }
+    @media (max-width: 700px){
+      .page{padding:16px; width:min(100vw - 10px, 1320px);} 
+      h1{font-size:28px;}
+      .line-field .label{font-size:18px;}
+      .purpose-title{font-size:20px;}
+      .cards{grid-template-columns:1fr;}
+    }
+    @media print{
+      body{background:#fff;}
+      .toolbar,.controls,.footer-note{display:none !important;}
+      .page{width:100%;margin:0;box-shadow:none;padding:8mm;}
+      h1{font-size:24px;margin-bottom:8px;}
+      .section-title{font-size:18px;}
+      th,td{border-width:1px;padding:4px 5px;}
+      td{height:28px;min-height:28px;}
+      .purpose-body{min-height:90px;}
+      .purpose-body textarea{min-height:72px;}
+      .cards{grid-template-columns:repeat(5, 1fr);}
+      .card{padding:6px 8px;border-radius:8px;}
+      .card .value{font-size:16px;}
+    }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <button class="primary" type="button" onclick="saveData()">保存</button>
+    <button type="button" onclick="loadData()">読込</button>
+    <button type="button" onclick="window.print()">印刷</button>
+    <button type="button" onclick="loadExampleForm()">記載例読込</button>
+    <button class="warn" type="button" onclick="loadStdSampleValues()">標準保障額サンプル読込</button>
+    <label class="file-btn warn" title="PDFを選択してOCR読込">PDF(OCR)読込
+      <input id="stdPdfInput" type="file" accept="application/pdf" />
+    </label>
+    <span id="ocrStatus" class="status hidden">OCR待機</span>
+    <button type="button" onclick="importStdJsonPrompt()">標準保障額JSON取込</button>
+    <button type="button" onclick="downloadStdJson()">標準保障額JSON出力</button>
+    <button type="button" onclick="downloadAllJson()">全体JSON出力</button>
+    <button type="button" onclick="clearForm()">初期化</button>
+  </div>
+
+  <div class="page">
+    <h1>企業防衛提案主意書</h1>
+
+    <div class="head-row">
+      <div class="line-field">
+        <div class="label">関与先名</div>
+        <div class="line"><input data-key="clientName" /></div>
+      </div>
+      <div class="meta-box">
+        <div class="date-row">
+          <span>令和</span>
+          <span class="inline-line year"><select id="reYear" data-key="reYear"></select></span><span>年</span>
+          <span class="inline-line sm"><select id="reMonth" data-key="reMonth"></select></span><span>月</span>
+          <span class="inline-line sm"><select id="reDay" data-key="reDay"></select></span><span>日</span>
+          <span>記入</span>
+        </div>
+        <div class="person-row">
+          <span>（担当：</span><span class="inline-line long"><input data-key="staffName"></span><span>）</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="top-grid">
+      <div>
+        <table class="mini">
+          <colgroup>
+            <col style="width:42%"><col style="width:18%"><col style="width:22%"><col style="width:18%">
+          </colgroup>
+          <tr>
+            <th>企業防衛対象者名</th>
+            <th>続柄</th>
+            <th>役職</th>
+            <th>対象</th>
+          </tr>
+          <tr>
+            <td><input data-key="target1_name"></td>
+            <td><select data-key="target1_relation" class="relation-select"></select></td>
+            <td><select data-key="target1_role" class="role-select"></select></td>
+            <td class="check-cell"><input type="checkbox" data-key="target1_checked"></td>
+          </tr>
+          <tr>
+            <td><input data-key="target2_name"></td>
+            <td><select data-key="target2_relation" class="relation-select"></select></td>
+            <td><select data-key="target2_role" class="role-select"></select></td>
+            <td class="check-cell"><input type="checkbox" data-key="target2_checked"></td>
+          </tr>
+          <tr>
+            <td><input data-key="target3_name"></td>
+            <td><select data-key="target3_relation" class="relation-select"></select></td>
+            <td><select data-key="target3_role" class="role-select"></select></td>
+            <td class="check-cell"><input type="checkbox" data-key="target3_checked"></td>
+          </tr>
+          <tr>
+            <td><input data-key="target4_name"></td>
+            <td><select data-key="target4_relation" class="relation-select"></select></td>
+            <td><select data-key="target4_role" class="role-select"></select></td>
+            <td class="check-cell"><input type="checkbox" data-key="target4_checked"></td>
+          </tr>
+        </table>
+
+        <table class="mini" style="margin-top:8px; width:82%;">
+          <colgroup>
+            <col style="width:48%"><col style="width:26%"><col style="width:26%">
+          </colgroup>
+          <tr>
+            <th class="left">リスク対策の確認の際に<br>ご同席頂きたい方</th>
+            <th>続柄</th>
+            <th>役職</th>
+          </tr>
+          <tr>
+            <td><input data-key="attendee1_name"></td>
+            <td><select data-key="attendee1_relation" class="relation-select"></select></td>
+            <td><select data-key="attendee1_role" class="role-select"></select></td>
+          </tr>
+          <tr>
+            <td><input data-key="attendee2_name"></td>
+            <td><select data-key="attendee2_relation" class="relation-select"></select></td>
+            <td><select data-key="attendee2_role" class="role-select"></select></td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="purpose-box">
+        <div class="purpose-title">主意書の目的</div>
+        <div class="purpose-body">
+          <textarea data-key="purposeText">経営においては、経営者・幹部の万一の場合に備えて、生命保険によるリスク対策が必要です。貴社の対策の現状及び既加入契約の目的を整理し、保険金使途を明確にすることにより過不足なくリスク対策が講じられているかを事務所担当者と一緒にご確認をお願い致します。</textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">
+        <span>標準保障額</span>
+        <span class="subtext">添付の標準保障額算定書との連携を見据えた入力欄です。</span>
+      </div>
+      <div class="grid-2">
+        <div>
+          <table class="std-table">
+            <colgroup>
+              <col style="width:48%"><col style="width:18%"><col style="width:34%">
+            </colgroup>
+            <tr>
+              <th>項目</th>
+              <th>金額</th>
+              <th>補足</th>
+            </tr>
+            <tr>
+              <td class="item">①運転資金＋固定費<span class="formula">（運転資金×必要倍数＋固定費（月額）×必要月数）</span></td>
+              <td><div class="amount-wrap"><input class="amount-input allow-negative std-field" data-key="std_1" data-std-json="1"><span class="amount-unit">万円</span></div></td>
+              <td><input data-key="std_1_note" placeholder="例：80万円×1.0倍 + 252万円×6か月"></td>
+            </tr>
+            <tr>
+              <td class="item">②借入金返済資金<span class="formula">（借入金残高×必要返済割合）</span></td>
+              <td><div class="amount-wrap"><input class="amount-input allow-negative std-field" data-key="std_2" data-std-json="2"><span class="amount-unit">万円</span></div></td>
+              <td><input data-key="std_2_note"></td>
+            </tr>
+            <tr>
+              <td class="item">③その他の負債</td>
+              <td><div class="amount-wrap"><input class="amount-input allow-negative std-field" data-key="std_3" data-std-json="3"><span class="amount-unit">万円</span></div></td>
+              <td><input data-key="std_3_note"></td>
+            </tr>
+            <tr>
+              <td class="item">④現金化可能な資産</td>
+              <td><div class="amount-wrap"><input class="amount-input allow-negative std-field" data-key="std_4" data-std-json="4"><span class="amount-unit">万円</span></div></td>
+              <td><input data-key="std_4_note" placeholder="資産控除はマイナスで入力"></td>
+            </tr>
+            <tr>
+              <td class="item">⑤納税準備資金<span class="formula">（実効税率33.58%の場合）</span></td>
+              <td><div class="amount-wrap"><input class="amount-input allow-negative std-field" data-key="std_5" data-std-json="5"><span class="amount-unit">万円</span></div></td>
+              <td><input data-key="std_5_note"></td>
+            </tr>
+            <tr class="group-row">
+              <td>A．企業防衛準備資金［社内留保］</td>
+              <td><div class="amount-wrap"><input class="amount-input readonly std-field" data-key="std_A" data-std-json="A" readonly><span class="amount-unit">万円</span></div></td>
+              <td class="tiny">①〜⑤の合計</td>
+            </tr>
+            <tr>
+              <td class="item">⑥役員退職慰労金<span class="formula">（報酬月額×在任年数×功績倍率）</span></td>
+              <td><div class="amount-wrap"><input class="amount-input allow-negative std-field" data-key="std_6" data-std-json="6"><span class="amount-unit">万円</span></div></td>
+              <td><input data-key="std_6_note"></td>
+            </tr>
+            <tr>
+              <td class="item">⑦功労加算金<span class="formula">（役員退職慰労金×0〜30%）</span></td>
+              <td><div class="amount-wrap"><input class="amount-input allow-negative std-field" data-key="std_7" data-std-json="7"><span class="amount-unit">万円</span></div></td>
+              <td><input data-key="std_7_note"></td>
+            </tr>
+            <tr>
+              <td class="item">⑧弔慰金<span class="formula">（報酬月額×6または36か月）</span></td>
+              <td><div class="amount-wrap"><input class="amount-input allow-negative std-field" data-key="std_8" data-std-json="8"><span class="amount-unit">万円</span></div></td>
+              <td><input data-key="std_8_note"></td>
+            </tr>
+            <tr class="group-row">
+              <td>B．役員退職慰労金準備資金［社外支出］</td>
+              <td><div class="amount-wrap"><input class="amount-input readonly std-field" data-key="std_B" data-std-json="B" readonly><span class="amount-unit">万円</span></div></td>
+              <td class="tiny">⑥〜⑧の合計</td>
+            </tr>
+            <tr class="sum-row">
+              <td>標準保障額［A＋B］</td>
+              <td><div class="amount-wrap"><input class="amount-input readonly std-field" data-key="std_total" data-std-json="total" readonly><span class="amount-unit">万円</span></div></td>
+              <td class="tiny">死亡の場合の基準値</td>
+            </tr>
+          </table>
+        </div>
+
+        <div>
+          <table class="scenario-table">
+            <colgroup>
+              <col style="width:34%"><col style="width:22%"><col style="width:22%"><col style="width:22%">
+            </colgroup>
+            <tr>
+              <th></th>
+              <th>死亡の場合</th>
+              <th>就業障がいの場合</th>
+              <th>重大疾病の場合</th>
+            </tr>
+            <tr>
+              <td class="row-title">Ⅰ 標準保障額［A＋B］</td>
+              <td><div class="amount-wrap"><input class="amount-input readonly" data-key="scenario_std_death"><span class="amount-unit">万円</span></div></td>
+              <td><div class="amount-wrap"><input class="amount-input readonly" data-key="scenario_std_disability"><span class="amount-unit">万円</span></div></td>
+              <td><div class="amount-wrap"><input class="amount-input" data-key="scenario_std_critical"><span class="amount-unit">万円</span></div></td>
+            </tr>
+            <tr>
+              <td class="row-title">Ⅱ 大同生命既加入保険金額</td>
+              <td><div class="amount-wrap"><input class="amount-input readonly" data-key="scenario_daidou_death"><span class="amount-unit">万円</span></div></td>
+              <td><div class="amount-wrap"><input class="amount-input readonly" data-key="scenario_daidou_disability"><span class="amount-unit">万円</span></div></td>
+              <td><div class="amount-wrap"><input class="amount-input readonly" data-key="scenario_daidou_critical"><span class="amount-unit">万円</span></div></td>
+            </tr>
+            <tr>
+              <td class="row-title">Ⅲ 他社既加入保険金額</td>
+              <td><div class="amount-wrap"><input class="amount-input readonly" data-key="scenario_other_death"><span class="amount-unit">万円</span></div></td>
+              <td><div class="amount-wrap"><input class="amount-input readonly" data-key="scenario_other_disability"><span class="amount-unit">万円</span></div></td>
+              <td><div class="amount-wrap"><input class="amount-input readonly" data-key="scenario_other_critical"><span class="amount-unit">万円</span></div></td>
+            </tr>
+            <tr>
+              <td class="row-title">Ⅳ 既加入合計</td>
+              <td><div class="amount-wrap"><input class="amount-input readonly" data-key="scenario_existing_death"><span class="amount-unit">万円</span></div></td>
+              <td><div class="amount-wrap"><input class="amount-input readonly" data-key="scenario_existing_disability"><span class="amount-unit">万円</span></div></td>
+              <td><div class="amount-wrap"><input class="amount-input readonly" data-key="scenario_existing_critical"><span class="amount-unit">万円</span></div></td>
+            </tr>
+            <tr>
+              <td class="row-title">Ⅴ 過不足額（既加入合計−標準保障額）</td>
+              <td><div class="amount-wrap"><input class="amount-input readonly allow-negative" data-key="scenario_gap_death"><span class="amount-unit">万円</span></div></td>
+              <td><div class="amount-wrap"><input class="amount-input readonly allow-negative" data-key="scenario_gap_disability"><span class="amount-unit">万円</span></div></td>
+              <td><div class="amount-wrap"><input class="amount-input readonly allow-negative" data-key="scenario_gap_critical"><span class="amount-unit">万円</span></div></td>
+            </tr>
+          </table>
+          <div class="hint-box">
+            <div>・死亡の場合は、標準保障額［A＋B］を基準に自動反映します。</div>
+            <div>・就業障がいの場合は、標準保障額［A＋B］から⑧弔慰金を控除した値を初期表示します。</div>
+            <div>・重大疾病の場合は、標準保障額算定書の数値を優先するため手入力可能にしています。</div>
+            <div>・大同生命・他社の各シナリオ金額は、各明細表の「明細から集計」ボタンで反映できます。</div>
+          </div>
+          <div class="cards" style="margin-top:10px;">
+            <div class="card"><div class="label">死亡 過不足額</div><div class="value danger" id="cardGapDeath">0万円</div></div>
+            <div class="card"><div class="label">就業障がい 過不足額</div><div class="value danger" id="cardGapDisability">0万円</div></div>
+            <div class="card"><div class="label">重大疾病 過不足額</div><div class="value danger" id="cardGapCritical">0万円</div></div>
+            <div class="card"><div class="label">大同生命 既加入合計</div><div class="value" id="cardDaidouTotal">0万円</div></div>
+            <div class="card"><div class="label">他社 既加入合計</div><div class="value" id="cardOtherTotal">0万円</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="insurer-head">
+        <div class="name">大同生命</div>
+        <div class="controls">
+          <button type="button" onclick="aggregateInsurer('daidou')">明細から集計</button>
+        </div>
+      </div>
+      <table>
+        <colgroup>
+          <col style="width:9%"><col style="width:14%"><col style="width:8%"><col style="width:8%"><col style="width:8%"><col style="width:8%"><col style="width:8%"><col style="width:8%"><col style="width:8%"><col style="width:8%"><col style="width:13%">
+        </colgroup>
+        <tr>
+          <th rowspan="2">事由</th>
+          <th rowspan="2"></th>
+          <th rowspan="2">タイプ</th>
+          <th rowspan="2">保険金額</th>
+          <th rowspan="2">解約返戻金</th>
+          <th colspan="5">保険金額使途</th>
+          <th rowspan="2">備考</th>
+        </tr>
+        <tr>
+          <th>借入金返済</th>
+          <th>退職金</th>
+          <th>固定費充当</th>
+          <th>運転資金</th>
+          <th>他</th>
+        </tr>
+        <tr>
+          <th>死亡</th>
+          <td></td>
+          <td class="center">Lα、R</td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="daidou_death_amount"><span class="amount-unit">万</span></div></td>
+          <td class="black"></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="daidou_death_use1"><span class="amount-unit">万</span></div></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="daidou_death_use2"><span class="amount-unit">万</span></div></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="daidou_death_use3"><span class="amount-unit">万</span></div></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="daidou_death_use4"><span class="amount-unit">万</span></div></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="daidou_death_use5"><span class="amount-unit">万</span></div></td>
+          <td><input data-key="daidou_death_note"></td>
+        </tr>
+        <tr>
+          <th rowspan="2">重大疾病</th>
+          <td class="small">就業不能<br>（長期療養）</td>
+          <td class="center">新J、J</td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="daidou_critical_long_amount"><span class="amount-unit">万</span></div></td>
+          <td class="black" rowspan="3"></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="daidou_critical_long_use1"><span class="amount-unit">万</span></div></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="daidou_critical_long_use2"><span class="amount-unit">万</span></div></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="daidou_critical_long_use3"><span class="amount-unit">万</span></div></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="daidou_critical_long_use4"><span class="amount-unit">万</span></div></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="daidou_critical_long_use5"><span class="amount-unit">万</span></div></td>
+          <td><input data-key="daidou_critical_long_note"></td>
+        </tr>
+        <tr>
+          <td class="small">一時離脱<br>（短期療養）</td>
+          <td class="center">J、J特約</td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="daidou_critical_short_amount"><span class="amount-unit">万</span></div></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="daidou_critical_short_use1"><span class="amount-unit">万</span></div></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="daidou_critical_short_use2"><span class="amount-unit">万</span></div></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="daidou_critical_short_use3"><span class="amount-unit">万</span></div></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="daidou_critical_short_use4"><span class="amount-unit">万</span></div></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="daidou_critical_short_use5"><span class="amount-unit">万</span></div></td>
+          <td><input data-key="daidou_critical_short_note"></td>
+        </tr>
+        <tr>
+          <th>障害</th>
+          <td class="small">障害等による<br>就業不能</td>
+          <td class="center">T</td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="daidou_disability_amount"><span class="amount-unit">万</span></div></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="daidou_disability_use1"><span class="amount-unit">万</span></div></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="daidou_disability_use2"><span class="amount-unit">万</span></div></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="daidou_disability_use3"><span class="amount-unit">万</span></div></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="daidou_disability_use4"><span class="amount-unit">万</span></div></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="daidou_disability_use5"><span class="amount-unit">万</span></div></td>
+          <td><input data-key="daidou_disability_note"></td>
+        </tr>
+        <tr>
+          <th>生存退職</th>
+          <td></td>
+          <td class="center gray">返戻金有</td>
+          <td class="black"></td>
+          <td class="gray center small">退職想定年齢<br><input data-key="daidou_retire_age" style="width:56px;text-align:center;border:none;outline:none;background:transparent;">歳</td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="daidou_retire_use1"><span class="amount-unit">万</span></div></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="daidou_retire_use2"><span class="amount-unit">万</span></div></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="daidou_retire_use3"><span class="amount-unit">万</span></div></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="daidou_retire_use4"><span class="amount-unit">万</span></div></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="daidou_retire_use5"><span class="amount-unit">万</span></div></td>
+          <td><input data-key="daidou_retire_note"></td>
+        </tr>
+      </table>
+      <div class="hint-box">
+        比較用シナリオ金額：
+        死亡＝死亡欄、就業障がい＝重大疾病（長期療養）＋障害、重大疾病＝重大疾病（長期療養）＋重大疾病（短期療養）として集計します。必要に応じて上の標準保障額比較表側で調整してください。
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="insurer-head">
+        <div class="name">他社</div>
+        <div class="controls">
+          <button type="button" onclick="aggregateInsurer('other')">明細から集計</button>
+        </div>
+      </div>
+      <table>
+        <colgroup>
+          <col style="width:9%"><col style="width:14%"><col style="width:8%"><col style="width:8%"><col style="width:8%"><col style="width:8%"><col style="width:8%"><col style="width:8%"><col style="width:8%"><col style="width:8%"><col style="width:13%">
+        </colgroup>
+        <tr>
+          <th rowspan="2">事由</th>
+          <th rowspan="2"></th>
+          <th rowspan="2">タイプ</th>
+          <th rowspan="2">保険金額</th>
+          <th rowspan="2">解約返戻金</th>
+          <th colspan="5">保険金額使途</th>
+          <th rowspan="2">備考</th>
+        </tr>
+        <tr>
+          <th>借入金返済</th>
+          <th>退職金</th>
+          <th>固定費充当</th>
+          <th>運転資金</th>
+          <th>他</th>
+        </tr>
+        <tr>
+          <th>死亡</th>
+          <td></td>
+          <td class="center">Lα、R</td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="other_death_amount"><span class="amount-unit">万</span></div></td>
+          <td class="black"></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="other_death_use1"><span class="amount-unit">万</span></div></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="other_death_use2"><span class="amount-unit">万</span></div></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="other_death_use3"><span class="amount-unit">万</span></div></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="other_death_use4"><span class="amount-unit">万</span></div></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="other_death_use5"><span class="amount-unit">万</span></div></td>
+          <td><input data-key="other_death_note"></td>
+        </tr>
+        <tr>
+          <th rowspan="2">重大疾病</th>
+          <td class="small">就業不能<br>（長期療養）</td>
+          <td class="center">新J、J</td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="other_critical_long_amount"><span class="amount-unit">万</span></div></td>
+          <td class="black" rowspan="3"></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="other_critical_long_use1"><span class="amount-unit">万</span></div></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="other_critical_long_use2"><span class="amount-unit">万</span></div></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="other_critical_long_use3"><span class="amount-unit">万</span></div></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="other_critical_long_use4"><span class="amount-unit">万</span></div></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="other_critical_long_use5"><span class="amount-unit">万</span></div></td>
+          <td><input data-key="other_critical_long_note"></td>
+        </tr>
+        <tr>
+          <td class="small">一時離脱<br>（短期療養）</td>
+          <td class="center">J、J特約</td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="other_critical_short_amount"><span class="amount-unit">万</span></div></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="other_critical_short_use1"><span class="amount-unit">万</span></div></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="other_critical_short_use2"><span class="amount-unit">万</span></div></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="other_critical_short_use3"><span class="amount-unit">万</span></div></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="other_critical_short_use4"><span class="amount-unit">万</span></div></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="other_critical_short_use5"><span class="amount-unit">万</span></div></td>
+          <td><input data-key="other_critical_short_note"></td>
+        </tr>
+        <tr>
+          <th>障害</th>
+          <td class="small">障害等による<br>就業不能</td>
+          <td class="center">T</td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="other_disability_amount"><span class="amount-unit">万</span></div></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="other_disability_use1"><span class="amount-unit">万</span></div></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="other_disability_use2"><span class="amount-unit">万</span></div></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="other_disability_use3"><span class="amount-unit">万</span></div></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="other_disability_use4"><span class="amount-unit">万</span></div></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="other_disability_use5"><span class="amount-unit">万</span></div></td>
+          <td><input data-key="other_disability_note"></td>
+        </tr>
+        <tr>
+          <th>生存退職</th>
+          <td></td>
+          <td class="center gray">返戻金有</td>
+          <td class="black"></td>
+          <td class="gray center small">退職想定年齢<br><input data-key="other_retire_age" style="width:56px;text-align:center;border:none;outline:none;background:transparent;">歳</td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="other_retire_use1"><span class="amount-unit">万</span></div></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="other_retire_use2"><span class="amount-unit">万</span></div></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="other_retire_use3"><span class="amount-unit">万</span></div></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="other_retire_use4"><span class="amount-unit">万</span></div></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="other_retire_use5"><span class="amount-unit">万</span></div></td>
+          <td><input data-key="other_retire_note"></td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="footer-note">
+      この版は、クライアントと同じ画面を見ながら「標準保障額」と「既加入保険金額」を比較し、不足額を共有する用途に寄せています。保険金額欄は数字のみ・万単位・リアルタイムコンマ表示です。標準保障額のサンプル値は、添付の標準保障額算定書に対応する値を呼び出せるようにしています。
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@4.4.168/build/pdf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
+  <script>
+    const STORAGE_KEY = 'enterprise_defense_form_v4';
+    const RELATIONS = ['', '本人', '配偶者', '子', '父', '母', '兄', '弟', '姉', '妹', '役員', '後継者', 'その他'];
+    const ROLES = ['', '社長', '会長', '取締役', '代表取締役', '専務', '常務', '執行役員', '部長', '後継者', '配偶者', 'その他'];
+
+    const DEFAULT_PURPOSE = '経営においては、経営者・幹部の万一の場合に備えて、生命保険によるリスク対策が必要です。貴社の対策の現状及び既加入契約の目的を整理し、保険金使途を明確にすることにより過不足なくリスク対策が講じられているかを事務所担当者と一緒にご確認をお願い致します。';
+
+    const EXAMPLE_FORM_DATA = {
+      clientName:'（株）鈴木商店',
+      staffName:'田中',
+      target1_name:'鈴木 一郎　様', target1_relation:'本人', target1_role:'社長', target1_checked:true,
+      target2_name:'鈴木 タケシ　様', target2_relation:'子', target2_role:'取締役',
+      attendee1_name:'鈴木 花子　様', attendee1_relation:'配偶者', attendee1_role:'',
+      purposeText: DEFAULT_PURPOSE,
+      daidou_death_amount:'10000', daidou_death_use1:'3000', daidou_death_use2:'3000', daidou_death_use4:'1000', daidou_death_use5:'3000',
+      daidou_critical_long_amount:'5000', daidou_critical_long_use1:'3000', daidou_critical_long_use2:'2000',
+      daidou_critical_short_amount:'3000', daidou_critical_short_use1:'3000',
+      daidou_disability_amount:'5000', daidou_disability_use1:'5000',
+      daidou_retire_age:'70', daidou_retire_use2:'1000', daidou_retire_note:'解約返戻金'
+    };
+
+    const STD_SAMPLE = {
+      clientName:'株式会社アート・ファーマー様',
+      staffName:'松本 考史',
+      std_1:'1592', std_1_note:'80万円×1.0倍 + 252万円×6か月',
+      std_2:'3000', std_2_note:'3,000万円×100%',
+      std_3:'18652',
+      std_4:'-7886',
+      std_5:'7764',
+      std_6:'2880', std_6_note:'90万円×16年×2.0倍',
+      std_7:'0', std_7_note:'2,880万円×0%',
+      std_8:'540', std_8_note:'90万円×6か月',
+      scenario_std_critical:'31351'
+    };
+
+    function fillSelect(select, items){
+      select.innerHTML = items.map(v => `<option value="${escapeAttr(v)}">${escapeHtml(v || '　')}</option>`).join('');
+    }
+
+    function populateSelectors(){
+      document.querySelectorAll('.relation-select').forEach(s => fillSelect(s, RELATIONS));
+      document.querySelectorAll('.role-select').forEach(s => fillSelect(s, ROLES));
+      const y = document.getElementById('reYear');
+      const m = document.getElementById('reMonth');
+      const d = document.getElementById('reDay');
+      const years = [''];
+      for(let i=1;i<=20;i++) years.push(String(i));
+      const months = [''];
+      for(let i=1;i<=12;i++) months.push(String(i));
+      const days = [''];
+      for(let i=1;i<=31;i++) days.push(String(i));
+      fillSelect(y, years); fillSelect(m, months); fillSelect(d, days);
+    }
+
+    function escapeHtml(value=''){
+      return String(value)
+        .replace(/&/g,'&amp;')
+        .replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;')
+        .replace(/"/g,'&quot;')
+        .replace(/'/g,'&#39;');
+    }
+    function escapeAttr(value=''){ return escapeHtml(value); }
+
+    function parseAmount(value){
+      if(value == null) return 0;
+      const raw = String(value).replace(/,/g,'').replace(/▲/g,'-').replace(/[^0-9\-]/g,'');
+      if(raw === '' || raw === '-') return 0;
+      const n = Number(raw);
+      return Number.isFinite(n) ? n : 0;
+    }
+
+    function formatAmount(value){
+      if(value === '' || value == null) return '';
+      const n = Number(value);
+      if(!Number.isFinite(n)) return '';
+      const abs = Math.abs(n).toLocaleString('ja-JP');
+      return n < 0 ? `▲${abs}` : abs;
+    }
+
+    function sanitizeAmountInput(el){
+      const allowNegative = el.classList.contains('allow-negative');
+      let value = String(el.value || '').replace(/,/g,'').replace(/▲/g,'-');
+      if(allowNegative){
+        value = value.replace(/(?!^)-/g,'').replace(/[^0-9\-]/g,'');
+        if(value.indexOf('-') > 0) value = value.replace(/-/g,'');
+        if((value.match(/-/g)||[]).length > 1) value = value.replace(/-/g,'');
+      } else {
+        value = value.replace(/\D/g,'');
+      }
+      if(value === '' || value === '-'){
+        el.dataset.raw = value;
+        el.value = value === '-' ? '▲' : '';
+        return;
+      }
+      const n = Number(value);
+      if(!Number.isFinite(n)) return;
+      el.dataset.raw = String(n);
+      el.value = formatAmount(n);
+    }
+
+    function getField(key){ return document.querySelector(`[data-key="${key}"]`); }
+    function setValue(key, value){
+      const el = getField(key);
+      if(!el) return;
+      if(el.type === 'checkbox'){ el.checked = !!value; return; }
+      el.value = value ?? '';
+      if(el.classList.contains('amount-input')) sanitizeAmountInput(el);
+    }
+    function getValue(el){
+      if(el.type === 'checkbox') return el.checked;
+      return el.value;
+    }
+
+    function setTodayReiwa(){
+      const now = new Date();
+      setValue('reYear', String(now.getFullYear() - 2018));
+      setValue('reMonth', String(now.getMonth() + 1));
+      setValue('reDay', String(now.getDate()));
+    }
+
+    function collectData(){
+      const data = {};
+      document.querySelectorAll('[data-key]').forEach(el => { data[el.dataset.key] = getValue(el); });
+      return data;
+    }
+
+    function applyData(data){
+      Object.entries(data || {}).forEach(([key, value]) => setValue(key, value));
+      recalcStandard();
+      recalcAllComparisons();
+    }
+
+    function saveData(){
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(collectData()));
+      alert('保存しました。');
+    }
+    function loadData(){
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw){ alert('保存データがありません。'); return; }
+      try{
+        applyData(JSON.parse(raw));
+        alert('読込しました。');
+      }catch(e){ alert('読込に失敗しました。'); }
+    }
+    function downloadAllJson(){
+      const blob = new Blob([JSON.stringify(collectData(), null, 2)], {type:'application/json'});
+      downloadBlob(blob, 'enterprise_defense_form.json');
+    }
+
+    function stdPayload(){
+      const payload = {
+        meta:{
+          clientName: getField('clientName')?.value || '',
+          staffName: getField('staffName')?.value || ''
+        },
+        base:{
+          '1': parseAmount(getField('std_1')?.value),
+          '2': parseAmount(getField('std_2')?.value),
+          '3': parseAmount(getField('std_3')?.value),
+          '4': parseAmount(getField('std_4')?.value),
+          '5': parseAmount(getField('std_5')?.value),
+          A: parseAmount(getField('std_A')?.value),
+          '6': parseAmount(getField('std_6')?.value),
+          '7': parseAmount(getField('std_7')?.value),
+          '8': parseAmount(getField('std_8')?.value),
+          B: parseAmount(getField('std_B')?.value),
+          total: parseAmount(getField('std_total')?.value)
+        },
+        scenarios:{
+          death: parseAmount(getField('scenario_std_death')?.value),
+          disability: parseAmount(getField('scenario_std_disability')?.value),
+          critical: parseAmount(getField('scenario_std_critical')?.value)
+        },
+        notes:{
+          '1': getField('std_1_note')?.value || '',
+          '2': getField('std_2_note')?.value || '',
+          '3': getField('std_3_note')?.value || '',
+          '4': getField('std_4_note')?.value || '',
+          '5': getField('std_5_note')?.value || '',
+          '6': getField('std_6_note')?.value || '',
+          '7': getField('std_7_note')?.value || '',
+          '8': getField('std_8_note')?.value || ''
+        }
+      };
+      return payload;
+    }
+
+    function downloadStdJson(){
+      const blob = new Blob([JSON.stringify(stdPayload(), null, 2)], {type:'application/json'});
+      downloadBlob(blob, 'standard_hosho_data.json');
+    }
+
+    function importStdJsonPrompt(){
+      const sample = JSON.stringify(stdPayload(), null, 2);
+      const input = prompt('標準保障額連携用JSONを貼り付けてください。\n\n想定形式の例：\n' + sample.slice(0, 500) + (sample.length > 500 ? '\n...' : ''));
+      if(!input) return;
+      try{
+        const json = JSON.parse(input);
+        if(json.meta){
+          if(json.meta.clientName != null) setValue('clientName', json.meta.clientName);
+          if(json.meta.staffName != null) setValue('staffName', json.meta.staffName);
+        }
+        if(json.base){
+          ['1','2','3','4','5','6','7','8','A','B','total'].forEach(k => {
+            if(json.base[k] != null){
+              const targetKey = ({A:'std_A',B:'std_B',total:'std_total'})[k] || `std_${k}`;
+              setValue(targetKey, String(json.base[k]));
+            }
+          });
+        }
+        if(json.notes){
+          ['1','2','3','4','5','6','7','8'].forEach(k => { if(json.notes[k] != null) setValue(`std_${k}_note`, json.notes[k]); });
+        }
+        if(json.scenarios){
+          if(json.scenarios.death != null) setValue('scenario_std_death', String(json.scenarios.death));
+          if(json.scenarios.disability != null) setValue('scenario_std_disability', String(json.scenarios.disability));
+          if(json.scenarios.critical != null) setValue('scenario_std_critical', String(json.scenarios.critical));
+        }
+        recalcStandard();
+        recalcAllComparisons();
+        alert('標準保障額JSONを反映しました。');
+      } catch(e){
+        alert('JSONの読込に失敗しました。形式を確認してください。');
+      }
+    }
+
+    function downloadBlob(blob, filename){
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = filename; a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function clearForm(){
+      if(!confirm('入力内容を初期化します。よろしいですか？')) return;
+      document.querySelectorAll('[data-key]').forEach(el => {
+        if(el.type === 'checkbox') el.checked = false;
+        else el.value = '';
+      });
+      document.querySelectorAll('.amount-input').forEach(el => { el.value = ''; el.dataset.raw = ''; });
+      setValue('purposeText', DEFAULT_PURPOSE);
+      setTodayReiwa();
+      recalcStandard();
+      recalcAllComparisons();
+    }
+
+    function loadExampleForm(){
+      applyData(EXAMPLE_FORM_DATA);
+      aggregateInsurer('daidou');
+    }
+
+    function loadStdSampleValues(){
+      applyData(STD_SAMPLE);
+      recalcStandard();
+      recalcAllComparisons();
+    }
+
+    function recalcStandard(){
+      const a = ['1','2','3','4','5'].reduce((sum,k)=>sum + parseAmount(getField(`std_${k}`)?.value),0);
+      const b = ['6','7','8'].reduce((sum,k)=>sum + parseAmount(getField(`std_${k}`)?.value),0);
+      const total = a + b;
+      setValue('std_A', String(a));
+      setValue('std_B', String(b));
+      setValue('std_total', String(total));
+      setValue('scenario_std_death', String(total));
+      setValue('scenario_std_disability', String(total - parseAmount(getField('std_8')?.value)));
+      if(!getField('scenario_std_critical')?.value){
+        setValue('scenario_std_critical', String(total - parseAmount(getField('std_8')?.value)));
+      } else {
+        sanitizeAmountInput(getField('scenario_std_critical'));
+      }
+    }
+
+    function aggregateInsurer(prefix){
+      const death = parseAmount(getField(`${prefix}_death_amount`)?.value);
+      const disability = parseAmount(getField(`${prefix}_critical_long_amount`)?.value) + parseAmount(getField(`${prefix}_disability_amount`)?.value);
+      const critical = parseAmount(getField(`${prefix}_critical_long_amount`)?.value) + parseAmount(getField(`${prefix}_critical_short_amount`)?.value);
+      setValue(`scenario_${prefix}_death`, String(death));
+      setValue(`scenario_${prefix}_disability`, String(disability));
+      setValue(`scenario_${prefix}_critical`, String(critical));
+      recalcAllComparisons();
+    }
+
+    function recalcAllComparisons(){
+      ['death','disability','critical'].forEach(kind => {
+        const std = parseAmount(getField(`scenario_std_${kind}`)?.value);
+        const daidou = parseAmount(getField(`scenario_daidou_${kind}`)?.value);
+        const other = parseAmount(getField(`scenario_other_${kind}`)?.value);
+        const existing = daidou + other;
+        const gap = existing - std;
+        setValue(`scenario_existing_${kind}`, String(existing));
+        setValue(`scenario_gap_${kind}`, String(gap));
+      });
+      document.getElementById('cardGapDeath').textContent = `${formatAmount(parseAmount(getField('scenario_gap_death')?.value))}万円`;
+      document.getElementById('cardGapDisability').textContent = `${formatAmount(parseAmount(getField('scenario_gap_disability')?.value))}万円`;
+      document.getElementById('cardGapCritical').textContent = `${formatAmount(parseAmount(getField('scenario_gap_critical')?.value))}万円`;
+      const daidouTotal = ['death','disability','critical'].reduce((s,k)=>s + parseAmount(getField(`scenario_daidou_${k}`)?.value), 0);
+      const otherTotal = ['death','disability','critical'].reduce((s,k)=>s + parseAmount(getField(`scenario_other_${k}`)?.value), 0);
+      document.getElementById('cardDaidouTotal').textContent = `${formatAmount(daidouTotal)}万円`;
+      document.getElementById('cardOtherTotal').textContent = `${formatAmount(otherTotal)}万円`;
+    }
+
+    function bindEvents(){
+      document.querySelectorAll('.amount-input').forEach(el => {
+        el.addEventListener('input', () => {
+          sanitizeAmountInput(el);
+          if(el.classList.contains('std-field') || el.dataset.key === 'scenario_std_critical') recalcStandard();
+          recalcAllComparisons();
+        });
+        el.addEventListener('blur', () => sanitizeAmountInput(el));
+      });
+      ['std_1','std_2','std_3','std_4','std_5','std_6','std_7','std_8','scenario_std_critical'].forEach(key => {
+        const el = getField(key);
+        if(el) el.addEventListener('input', () => { recalcStandard(); recalcAllComparisons(); });
+      });
+      document.querySelectorAll('[data-key]').forEach(el => {
+        if(el.classList.contains('amount-input')) return;
+        el.addEventListener('change', () => recalcAllComparisons());
+      });
+    }
+
+
+
+    // --- PDF OCR (client-side) ---
+    function setOcrStatus(msg, busy=false){
+      const el = document.getElementById('ocrStatus');
+      if(!el) return;
+      if(!msg){ el.classList.add('hidden'); return; }
+      el.classList.remove('hidden');
+      el.textContent = msg;
+      el.style.opacity = busy ? '1' : '0.95';
+    }
+
+    function normalizeOcrText(t){
+      return String(t||'')
+        .replace(/　/g,' ') // full-width space
+        .replace(/[\r\t]/g,' ')
+        .replace(/\s+/g,' ') 
+        .replace(/：/g,':')
+        .replace(/，/g,',')
+        .replace(/−/g,'-')
+        .trim();
+    }
+
+    function findNumberNear(labelRegex, text, lookahead=160){
+      const m = text.match(labelRegex);
+      if(!m) return null;
+      const idx = m.index ?? -1;
+      if(idx < 0) return null;
+      const seg = text.slice(idx, idx + lookahead);
+
+      // Collect candidates like "1,592万円" or "1592万円" and pick the largest (to avoid grabbing formula components like 80万円/252万円)
+      const moneyRe = /([▲-]?\s*\d{1,3}(?:,\d{3})+|[▲-]?\s*\d{2,})\s*万円/g;
+      const candidates = [];
+      let mm;
+      while((mm = moneyRe.exec(seg)) !== null){
+        const raw = mm[1];
+        const v = Number(String(raw).replace(/\s/g,'').replace(/▲/g,'-').replace(/,/g,''));
+        if(Number.isFinite(v)) candidates.push({raw, v});
+      }
+      if(candidates.length){
+        candidates.sort((a,b)=>Math.abs(b.v)-Math.abs(a.v));
+        return candidates[0].raw;
+      }
+
+      // Fallback: pick the largest bare number
+      const numRe = /([▲-]?\s*\d{1,3}(?:,\d{3})+|[▲-]?\s*\d{2,})/g;
+      while((mm = numRe.exec(seg)) !== null){
+        const raw = mm[1];
+        const v = Number(String(raw).replace(/\s/g,'').replace(/▲/g,'-').replace(/,/g,''));
+        if(Number.isFinite(v)) candidates.push({raw, v});
+      }
+      if(candidates.length){
+        candidates.sort((a,b)=>Math.abs(b.v)-Math.abs(a.v));
+        return candidates[0].raw;
+      }
+      return null;
+    }
+
+    function cleanNumberString(s){
+      if(s == null) return null;
+      let v = String(s).replace(/\s/g,'').replace(/▲/g,'-');
+      // OCR sometimes misreads triangle as A
+      v = v.replace(/^A(?=\d)/,'-');
+      // keep digits, comma, leading minus
+      v = v.replace(/(?!^)-/g,'');
+      v = v.replace(/[^0-9,\-]/g,'');
+      return v;
+    }
+
+    async function loadStdFromPdfOCR(file){
+      if(!file) return;
+      try{
+        setOcrStatus('PDF読込中…', true);
+        if(!window.pdfjsLib){
+          alert('PDF読込ライブラリ(pdf.js)の読み込みに失敗しました。ネットワーク接続をご確認ください。');
+          setOcrStatus('', false);
+          return;
+        }
+        // Configure worker
+        try{
+          pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.4.168/build/pdf.worker.min.js';
+        }catch(_){/* ignore */}
+
+        const buf = await file.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({data: buf}).promise;
+        const page = await pdf.getPage(1);
+
+        // Render to canvas at high scale for OCR accuracy
+        const scale = 2.5;
+        const viewport = page.getViewport({scale});
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.floor(viewport.width);
+        canvas.height = Math.floor(viewport.height);
+        const ctx = canvas.getContext('2d', {willReadFrequently:true});
+        await page.render({canvasContext: ctx, viewport}).promise;
+
+        if(!window.Tesseract){
+          alert('OCRライブラリ(Tesseract.js)の読み込みに失敗しました。ネットワーク接続をご確認ください。');
+          setOcrStatus('', false);
+          return;
+        }
+
+        setOcrStatus('OCR実行中…（初回は数十秒かかることがあります）', true);
+        const result = await Tesseract.recognize(canvas, 'jpn', {
+          logger: (m) => {
+            if(m.status){
+              const pct = (m.progress != null) ? ` ${(m.progress*100).toFixed(0)}%` : '';
+              setOcrStatus(`OCR ${m.status}${pct}`, true);
+            }
+          }
+        });
+
+        const rawText = result?.data?.text || '';
+        const text = normalizeOcrText(rawText);
+
+        // Extract key fields
+        const extracted = {};
+        // Names
+        const clientMatch = text.match(/関与先名:([^\s]+?)(?:担当者:|役職|$)/);
+        if(clientMatch) extracted.clientName = clientMatch[1].replace(/様$/,'様').trim();
+        const staffMatch = text.match(/担当者:([^\s]+?)(?:関与先名:|役職|$)/);
+        if(staffMatch) extracted.staffName = staffMatch[1].trim();
+
+        // Base items
+        const baseMap = [
+          ['std_1', /運転資金\+?固定費|運転資金＋固定費/],
+          ['std_2', /借入金返済資金/],
+          ['std_3', /その他の負債/],
+          ['std_4', /現金化可能な資産/],
+          ['std_5', /納税準備資金/],
+          ['std_6', /役員退職慰労金/],
+          ['std_7', /功労加算金/],
+          ['std_8', /弔慰金/],
+        ];
+        for(const [key, rx] of baseMap){
+          const n = findNumberNear(rx, text);
+          const c = cleanNumberString(n);
+          if(c) extracted[key] = c;
+        }
+
+        // Scenario totals (prefer bottom table)
+        const death = cleanNumberString(findNumberNear(/死亡の場合/, text, 220));
+        const disab = cleanNumberString(findNumberNear(/就業障がいの場合|就業障碍の場合|就業障害の場合/, text, 260));
+        const crit = cleanNumberString(findNumberNear(/重大疾病の場合|重大疾患の場合|重大疾病の場/, text, 260));
+        if(death) extracted.scenario_std_death = death;
+        if(disab) extracted.scenario_std_disability = disab;
+        if(crit) extracted.scenario_std_critical = crit;
+
+        // Apply
+        const appliedKeys = Object.keys(extracted);
+        const msg = `OCR結果を反映しますか？
+
+反映候補: ${appliedKeys.join(', ')}
+
+※認識結果は必ず目視で確認してください。`;
+        if(!confirm(msg)){
+          setOcrStatus('OCR結果を破棄しました', false);
+          return;
+        }
+        applyData(extracted);
+        recalcStandard();
+        recalcAllComparisons();
+        setOcrStatus('OCR反映完了', false);
+        setTimeout(()=>setOcrStatus('', false), 2500);
+      } catch(err){
+        console.error(err);
+        alert('PDF OCR読込に失敗しました。PDFの品質（スキャンの解像度）やネットワーク接続をご確認ください。');
+        setOcrStatus('OCR失敗', false);
+        setTimeout(()=>setOcrStatus('', false), 2500);
+      }
+    }
+
+    function wirePdfInput(){
+      const input = document.getElementById('stdPdfInput');
+      if(!input) return;
+      input.addEventListener('change', async () => {
+        const file = input.files && input.files[0];
+        if(!file) return;
+        await loadStdFromPdfOCR(file);
+        input.value = '';
+      });
+    }
+
+    function init(){
+      populateSelectors();
+      bindEvents();
+      wirePdfInput();
+      setTodayReiwa();
+      setValue('purposeText', DEFAULT_PURPOSE);
+      recalcStandard();
+      recalcAllComparisons();
+    }
+
+    init();
+  </script>
+</body>
+</html>

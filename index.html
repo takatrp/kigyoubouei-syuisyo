@@ -140,7 +140,7 @@
     <button type="button" onclick="window.print()">印刷</button>
     <button type="button" onclick="loadExampleForm()">記載例読込</button>
     <button class="warn" type="button" onclick="loadStdSampleValues()">標準保障額サンプル読込</button>
-    <label class="file-btn warn" title="PDFを選択してOCR読込">PDF(OCR)読込
+    <label class="file-btn warn" title="PDFを選択してオフライン読込">PDF読込(オフライン)
       <input id="stdPdfInput" type="file" accept="application/pdf" />
     </label>
     <span id="ocrStatus" class="status hidden">OCR待機</span>
@@ -566,8 +566,137 @@
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@4.4.168/build/pdf.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+  <script>
+    const PDFJS_IMPORT_CANDIDATES = [
+      'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.4.168/legacy/build/pdf.min.mjs',
+      'https://unpkg.com/pdfjs-dist@4.4.168/legacy/build/pdf.min.mjs',
+      'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.4.168/build/pdf.min.mjs',
+      'https://unpkg.com/pdfjs-dist@4.4.168/build/pdf.min.mjs'
+    ];
+    const PDFJS_WORKER_CANDIDATES = [
+      'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.4.168/legacy/build/pdf.worker.min.mjs',
+      'https://unpkg.com/pdfjs-dist@4.4.168/legacy/build/pdf.worker.min.mjs',
+      'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.4.168/build/pdf.worker.min.mjs',
+      'https://unpkg.com/pdfjs-dist@4.4.168/build/pdf.worker.min.mjs'
+    ];
+    const TESSERACT_SCRIPT_CANDIDATES = [
+      'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js',
+      'https://unpkg.com/tesseract.js@5/dist/tesseract.min.js'
+    ];
+    const TESSERACT_WORKER_CANDIDATES = [
+      'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/worker.min.js',
+      'https://unpkg.com/tesseract.js@5/dist/worker.min.js'
+    ];
+    const TESSERACT_CORE_CANDIDATES = [
+      'https://cdn.jsdelivr.net/npm/tesseract.js-core@5',
+      'https://unpkg.com/tesseract.js-core@5'
+    ];
+    const TESSERACT_LANG_CANDIDATES = [
+      'https://cdn.jsdelivr.net/npm/@tesseract.js-data/jpn/4.0.0_best',
+      'https://cdn.jsdelivr.net/npm/@tesseract.js-data/jpn/4.0.0_fast',
+      'https://tessdata.projectnaptha.com/4.0.0'
+    ];
+
+    async function loadScriptWithFallback(urls){
+      let lastErr = null;
+      for(const url of urls){
+        try{
+          await new Promise((resolve, reject) => {
+            const s = document.createElement('script');
+            s.src = url;
+            s.async = true;
+            s.onload = () => resolve(url);
+            s.onerror = () => reject(new Error('load failed: ' + url));
+            document.head.appendChild(s);
+          });
+          return url;
+        }catch(err){ lastErr = err; }
+      }
+      throw lastErr || new Error('script load failed');
+    }
+
+    async function loadPdfJsLib(){
+      if(window.pdfjsLib) return window.pdfjsLib;
+      let lastErr = null;
+      for(let i=0;i<PDFJS_IMPORT_CANDIDATES.length;i++){
+        const url = PDFJS_IMPORT_CANDIDATES[i];
+        try{
+          const mod = await import(url);
+          window.pdfjsLib = mod;
+          window.__pdfjsLoadedFromIndex = i;
+          return window.pdfjsLib;
+        }catch(err){ lastErr = err; }
+      }
+      throw lastErr || new Error('pdf.js load failed');
+    }
+
+    async function loadTesseractLib(){
+      if(window.Tesseract) return window.Tesseract;
+      let lastErr = null;
+      for(let i=0;i<TESSERACT_SCRIPT_CANDIDATES.length;i++){
+        try{
+          await loadScriptWithFallback([TESSERACT_SCRIPT_CANDIDATES[i]]);
+          if(window.Tesseract){
+            window.__tesseractLoadedFromIndex = i;
+            return window.Tesseract;
+          }
+        }catch(err){ lastErr = err; }
+      }
+      throw lastErr || new Error('tesseract load failed');
+    }
+
+    async function recognizeWithFallback(TesseractLib, canvas, logger){
+      const configs = [
+        {
+          workerPath: TESSERACT_WORKER_CANDIDATES[0],
+          corePath: TESSERACT_CORE_CANDIDATES[0],
+          langPath: TESSERACT_LANG_CANDIDATES[0]
+        },
+        {
+          workerPath: TESSERACT_WORKER_CANDIDATES[1],
+          corePath: TESSERACT_CORE_CANDIDATES[1],
+          langPath: TESSERACT_LANG_CANDIDATES[0]
+        },
+        {
+          workerPath: TESSERACT_WORKER_CANDIDATES[0],
+          corePath: TESSERACT_CORE_CANDIDATES[0],
+          langPath: TESSERACT_LANG_CANDIDATES[1]
+        },
+        {
+          workerPath: TESSERACT_WORKER_CANDIDATES[1],
+          corePath: TESSERACT_CORE_CANDIDATES[1],
+          langPath: TESSERACT_LANG_CANDIDATES[1]
+        },
+        {
+          workerPath: TESSERACT_WORKER_CANDIDATES[0],
+          corePath: TESSERACT_CORE_CANDIDATES[0],
+          langPath: TESSERACT_LANG_CANDIDATES[2]
+        },
+        {
+          workerPath: TESSERACT_WORKER_CANDIDATES[1],
+          corePath: TESSERACT_CORE_CANDIDATES[1],
+          langPath: TESSERACT_LANG_CANDIDATES[2]
+        }
+      ];
+      const startIndex = window.__tesseractLoadedFromIndex || 0;
+      const ordered = configs.sort((a,b)=>{
+        const ad = (a.workerPath === TESSERACT_WORKER_CANDIDATES[startIndex]) ? 0 : 1;
+        const bd = (b.workerPath === TESSERACT_WORKER_CANDIDATES[startIndex]) ? 0 : 1;
+        return ad - bd;
+      });
+      let lastErr = null;
+      for(const cfg of ordered){
+        try{
+          return await TesseractLib.recognize(canvas, 'jpn', {...cfg, logger});
+        }catch(err){
+          console.error('Tesseract retrying with another CDN/path', cfg, err);
+          lastErr = err;
+        }
+      }
+      throw lastErr || new Error('OCR failed');
+    }
+
+  </script>
 
   <script>
     const STORAGE_KEY = 'enterprise_defense_form_v4';
@@ -893,7 +1022,8 @@
 
 
 
-    // --- PDF OCR (client-side) ---
+
+    // --- PDF offline import (no network) ---
     function setOcrStatus(msg, busy=false){
       const el = document.getElementById('ocrStatus');
       if(!el) return;
@@ -905,23 +1035,195 @@
 
     function normalizeOcrText(t){
       return String(t||'')
-        .replace(/　/g,' ') // full-width space
+        .replace(/\u3000/g,' ')
         .replace(/[\r\t]/g,' ')
-        .replace(/\s+/g,' ') 
+        .replace(/\s+/g,' ')
         .replace(/：/g,':')
         .replace(/，/g,',')
         .replace(/−/g,'-')
         .trim();
     }
 
-    function findNumberNear(labelRegex, text, lookahead=160){
+    function cleanNumberString(s){
+      if(s == null) return null;
+      let v = String(s).replace(/\s/g,'').replace(/▲/g,'-').replace(/^A(?=\d)/,'-');
+      v = v.replace(/(?!^)-/g,'');
+      v = v.replace(/[^0-9,\-]/g,'');
+      return v;
+    }
+
+    function bytesToLatin1(bytes){
+      let out='';
+      const chunk=0x8000;
+      for(let i=0;i<bytes.length;i+=chunk){
+        out += String.fromCharCode.apply(null, bytes.subarray(i, Math.min(bytes.length, i+chunk)));
+      }
+      return out;
+    }
+
+    function utf16beHexToString(hex){
+      let s='';
+      for(let i=0;i+4<=hex.length;i+=4){
+        const code = parseInt(hex.slice(i,i+4),16);
+        if(Number.isFinite(code)) s += String.fromCharCode(code);
+      }
+      return s;
+    }
+
+    async function inflateBytes(bytes){
+      const ds = new DecompressionStream('deflate');
+      const stream = new Blob([bytes]).stream().pipeThrough(ds);
+      const ab = await new Response(stream).arrayBuffer();
+      return new Uint8Array(ab);
+    }
+
+    async function parsePdfObjects(bytes){
+      const src = bytesToLatin1(bytes);
+      const re = /(\d+)\s+(\d+)\s+obj([\s\S]*?)endobj/g;
+      const objects = {};
+      let m;
+      while((m = re.exec(src)) !== null){
+        const id = `${m[1]} ${m[2]}`;
+        const body = m[3];
+        let streamBytes = null;
+        const sm = body.match(/stream\r?\n([\s\S]*?)\r?\nendstream/);
+        if(sm){
+          const full = sm[0];
+          const fullIndex = body.indexOf(full);
+          const prefix = body.slice(0, fullIndex);
+          const streamKeywordIndex = prefix.length + body.slice(fullIndex).indexOf('stream');
+          let dataStartInBody = streamKeywordIndex + 'stream'.length;
+          if(body.charCodeAt(dataStartInBody) === 13 && body.charCodeAt(dataStartInBody+1) === 10) dataStartInBody += 2;
+          else if(body.charCodeAt(dataStartInBody) === 10) dataStartInBody += 1;
+          const dataEndInBody = body.indexOf('\nendstream', dataStartInBody) >= 0 ? body.indexOf('\nendstream', dataStartInBody) : body.indexOf('\rendstream', dataStartInBody);
+          const objStartInSrc = m.index + m[0].indexOf(body);
+          const absStart = objStartInSrc + dataStartInBody;
+          const absEnd = objStartInSrc + dataEndInBody;
+          streamBytes = bytes.subarray(absStart, absEnd);
+        }
+        objects[id] = {id, body, streamBytes};
+      }
+      return objects;
+    }
+
+    async function buildToUnicodeMaps(objects){
+      const cmapByObj = {};
+      for(const [id,obj] of Object.entries(objects)){
+        if(!/begincmap/.test(obj.body)) continue;
+        let raw = obj.streamBytes;
+        if(!raw) continue;
+        try{
+          if(/\/FlateDecode/.test(obj.body)) raw = await inflateBytes(raw);
+        }catch(_){ }
+        const txt = bytesToLatin1(raw);
+        const map = {};
+        const bfchar = /(\d+)\s+beginbfchar([\s\S]*?)endbfchar/g;
+        let m;
+        while((m = bfchar.exec(txt)) !== null){
+          const sec = m[2];
+          const pairRe = /<([0-9A-Fa-f]+)>\s*<([0-9A-Fa-f]+)>/g;
+          let p;
+          while((p = pairRe.exec(sec)) !== null){
+            map[p[1].toUpperCase()] = utf16beHexToString(p[2]);
+          }
+        }
+        const bfrange = /(\d+)\s+beginbfrange([\s\S]*?)endbfrange/g;
+        while((m = bfrange.exec(txt)) !== null){
+          const sec = m[2];
+          const lineRe = /<([0-9A-Fa-f]+)>\s*<([0-9A-Fa-f]+)>\s*(<([0-9A-Fa-f]+)>|\[(.*?)\])/g;
+          let p;
+          while((p = lineRe.exec(sec)) !== null){
+            const start = parseInt(p[1],16), end = parseInt(p[2],16);
+            if(p[4]){
+              let uni = parseInt(p[4],16);
+              for(let c=start;c<=end;c++) map[c.toString(16).toUpperCase().padStart(p[1].length,'0')] = String.fromCharCode(uni++);
+            }else if(p[5]){
+              const arr=[];
+              const arrRe=/<([0-9A-Fa-f]+)>/g; let a;
+              while((a=arrRe.exec(p[5]))!==null) arr.push(utf16beHexToString(a[1]));
+              for(let i=0;i<arr.length;i++) map[(start+i).toString(16).toUpperCase().padStart(p[1].length,'0')] = arr[i];
+            }
+          }
+        }
+        cmapByObj[id] = map;
+      }
+      return cmapByObj;
+    }
+
+    function resolveFontMapsForContent(contentBody, objects, cmapByObj){
+      const fontMap = {};
+      const fontResRefs = [...contentBody.matchAll(/\/([A-Za-z0-9]+)\s+(\d+)\s+(\d+)\s+R/g)];
+      for(const m of fontResRefs){
+        const fontName = '/' + m[1];
+        const fontObj = objects[`${m[2]} ${m[3]}`];
+        if(!fontObj) continue;
+        const tu = fontObj.body.match(/\/ToUnicode\s+(\d+)\s+(\d+)\s+R/);
+        if(tu){
+          fontMap[fontName] = cmapByObj[`${tu[1]} ${tu[2]}`] || {};
+        }
+      }
+      return fontMap;
+    }
+
+    function decodePdfLiteral(str){
+      return str.replace(/\\([nrtbf()\\])/g, (_,c)=>({n:'\n',r:'\r',t:'\t',b:'\b',f:'\f','(':'(',')':')','\\':'\\'}[c]||c));
+    }
+
+    function decodeHexWithMap(hex, cmap){
+      let out='';
+      for(let i=0;i+4<=hex.length;i+=4){
+        const code = hex.slice(i,i+4).toUpperCase();
+        out += (cmap && cmap[code]) ? cmap[code] : '';
+      }
+      return out;
+    }
+
+    async function extractTextFromPdfOffline(file){
+      const bytes = new Uint8Array(await file.arrayBuffer());
+      const objects = await parsePdfObjects(bytes);
+      const cmapByObj = await buildToUnicodeMaps(objects);
+      let extracted = [];
+      for(const obj of Object.values(objects)){
+        if(!obj.streamBytes) continue;
+        const looksLikeContent = /BT/.test(obj.body) || /\/Subtype\s*\/Form/.test(obj.body);
+        if(!looksLikeContent) continue;
+        let raw = obj.streamBytes;
+        try{ if(/\/FlateDecode/.test(obj.body)) raw = await inflateBytes(raw); }catch(_){ continue; }
+        const txt = bytesToLatin1(raw);
+        if(!/BT/.test(txt) && !/Tj|TJ/.test(txt)) continue;
+        const fontMaps = resolveFontMapsForContent(obj.body, objects, cmapByObj);
+        let currentFont = '/F1';
+        const tokenRe = /\/([A-Za-z0-9]+)\s+\d+(?:\.\d+)?\s+Tf|\[(.*?)\]\s*TJ|<([0-9A-Fa-f]+)>\s*Tj|\((.*?)\)\s*Tj/g;
+        let m;
+        while((m = tokenRe.exec(txt)) !== null){
+          if(m[1]){ currentFont = '/' + m[1]; continue; }
+          const cmap = fontMaps[currentFont] || {};
+          if(m[2] != null){
+            const sec = m[2];
+            let s='';
+            const partRe = /<([0-9A-Fa-f]+)>|\((.*?)\)/g;
+            let p;
+            while((p=partRe.exec(sec))!==null){
+              if(p[1]) s += decodeHexWithMap(p[1], cmap);
+              else if(p[2] != null) s += decodePdfLiteral(p[2]);
+            }
+            if(s) extracted.push(s);
+          }else if(m[3]){
+            const s = decodeHexWithMap(m[3], cmap); if(s) extracted.push(s);
+          }else if(m[4] != null){
+            const s = decodePdfLiteral(m[4]); if(s) extracted.push(s);
+          }
+        }
+      }
+      return normalizeOcrText(extracted.join(' '));
+    }
+
+    function findNumberNear(labelRegex, text, lookahead=220){
       const m = text.match(labelRegex);
       if(!m) return null;
       const idx = m.index ?? -1;
       if(idx < 0) return null;
       const seg = text.slice(idx, idx + lookahead);
-
-      // Collect candidates like "1,592万円" or "1592万円" and pick the largest (to avoid grabbing formula components like 80万円/252万円)
       const moneyRe = /([▲-]?\s*\d{1,3}(?:,\d{3})+|[▲-]?\s*\d{2,})\s*万円/g;
       const candidates = [];
       let mm;
@@ -934,87 +1236,38 @@
         candidates.sort((a,b)=>Math.abs(b.v)-Math.abs(a.v));
         return candidates[0].raw;
       }
-
-      // Fallback: pick the largest bare number
-      const numRe = /([▲-]?\s*\d{1,3}(?:,\d{3})+|[▲-]?\s*\d{2,})/g;
-      while((mm = numRe.exec(seg)) !== null){
-        const raw = mm[1];
-        const v = Number(String(raw).replace(/\s/g,'').replace(/▲/g,'-').replace(/,/g,''));
-        if(Number.isFinite(v)) candidates.push({raw, v});
-      }
-      if(candidates.length){
-        candidates.sort((a,b)=>Math.abs(b.v)-Math.abs(a.v));
-        return candidates[0].raw;
-      }
       return null;
     }
 
-    function cleanNumberString(s){
-      if(s == null) return null;
-      let v = String(s).replace(/\s/g,'').replace(/▲/g,'-');
-      // OCR sometimes misreads triangle as A
-      v = v.replace(/^A(?=\d)/,'-');
-      // keep digits, comma, leading minus
-      v = v.replace(/(?!^)-/g,'');
-      v = v.replace(/[^0-9,\-]/g,'');
-      return v;
+    function applyStdExtractedValues(extracted){
+      const appliedKeys = [];
+      for(const [k,v] of Object.entries(extracted)){
+        if(v == null || v === '') continue;
+        setValue(k, v);
+        appliedKeys.push(k);
+      }
+      if(appliedKeys.some(k => /^std_|^scenario_std_/.test(k))) recalcStandard();
+      recalcAllComparisons();
+      return appliedKeys;
     }
 
     async function loadStdFromPdfOCR(file){
       if(!file) return;
       try{
-        setOcrStatus('PDF読込中…', true);
-        if(!window.pdfjsLib){
-          alert('PDF読込ライブラリ(pdf.js)の読み込みに失敗しました。ネットワーク接続をご確認ください。');
-          setOcrStatus('', false);
-          return;
-        }
-        // Configure worker
-        try{
-          pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.4.168/build/pdf.worker.min.js';
-        }catch(_){/* ignore */}
-
-        const buf = await file.arrayBuffer();
-        const pdf = await pdfjsLib.getDocument({data: buf}).promise;
-        const page = await pdf.getPage(1);
-
-        // Render to canvas at high scale for OCR accuracy
-        const scale = 2.5;
-        const viewport = page.getViewport({scale});
-        const canvas = document.createElement('canvas');
-        canvas.width = Math.floor(viewport.width);
-        canvas.height = Math.floor(viewport.height);
-        const ctx = canvas.getContext('2d', {willReadFrequently:true});
-        await page.render({canvasContext: ctx, viewport}).promise;
-
-        if(!window.Tesseract){
-          alert('OCRライブラリ(Tesseract.js)の読み込みに失敗しました。ネットワーク接続をご確認ください。');
+        setOcrStatus('PDF解析中…', true);
+        const text = await extractTextFromPdfOffline(file);
+        if(!text){
+          alert('PDF内のテキストを読み取れませんでした。\n\nこのオフライン版は、PDF内に文字情報が埋め込まれている帳票には対応できますが、画像だけで構成されたPDFには対応できません。');
           setOcrStatus('', false);
           return;
         }
 
-        setOcrStatus('OCR実行中…（初回は数十秒かかることがあります）', true);
-        const result = await Tesseract.recognize(canvas, 'jpn', {
-          logger: (m) => {
-            if(m.status){
-              const pct = (m.progress != null) ? ` ${(m.progress*100).toFixed(0)}%` : '';
-              setOcrStatus(`OCR ${m.status}${pct}`, true);
-            }
-          }
-        });
-
-        const rawText = result?.data?.text || '';
-        const text = normalizeOcrText(rawText);
-
-        // Extract key fields
         const extracted = {};
-        // Names
-        const clientMatch = text.match(/関与先名:([^\s]+?)(?:担当者:|役職|$)/);
-        if(clientMatch) extracted.clientName = clientMatch[1].replace(/様$/,'様').trim();
-        const staffMatch = text.match(/担当者:([^\s]+?)(?:関与先名:|役職|$)/);
+        const clientMatch = text.match(/関与先名:?\s*([^\s]+?様?)(?:\s*\(|\s*担当者:|\s*役\s*職|$)/);
+        if(clientMatch) extracted.clientName = clientMatch[1].trim();
+        const staffMatch = text.match(/担当者:?\s*([^\s]+(?:\s*[^\s]+)?)(?:\s*関与先名|\s*役\s*職|$)/);
         if(staffMatch) extracted.staffName = staffMatch[1].trim();
 
-        // Base items
         const baseMap = [
           ['std_1', /運転資金\+?固定費|運転資金＋固定費/],
           ['std_2', /借入金返済資金/],
@@ -1026,65 +1279,26 @@
           ['std_8', /弔慰金/],
         ];
         for(const [key, rx] of baseMap){
-          const n = findNumberNear(rx, text);
-          const c = cleanNumberString(n);
-          if(c) extracted[key] = c;
+          const n = cleanNumberString(findNumberNear(rx, text));
+          if(n) extracted[key] = n;
         }
-
-        // Scenario totals (prefer bottom table)
-        const death = cleanNumberString(findNumberNear(/死亡の場合/, text, 220));
-        const disab = cleanNumberString(findNumberNear(/就業障がいの場合|就業障碍の場合|就業障害の場合/, text, 260));
-        const crit = cleanNumberString(findNumberNear(/重大疾病の場合|重大疾患の場合|重大疾病の場/, text, 260));
+        const death = cleanNumberString(findNumberNear(/死亡の場合/, text, 260));
+        const disab = cleanNumberString(findNumberNear(/就業障がいの場合|就業障碍の場合|就業障害の場合/, text, 300));
+        const crit = cleanNumberString(findNumberNear(/重大疾病の場合|重大疾患の場合/, text, 300));
         if(death) extracted.scenario_std_death = death;
         if(disab) extracted.scenario_std_disability = disab;
         if(crit) extracted.scenario_std_critical = crit;
 
-        // Apply
-        const appliedKeys = Object.keys(extracted);
-        const msg = `OCR結果を反映しますか？
-
-反映候補: ${appliedKeys.join(', ')}
-
-※認識結果は必ず目視で確認してください。`;
-        if(!confirm(msg)){
-          setOcrStatus('OCR結果を破棄しました', false);
+        const appliedKeys = applyStdExtractedValues(extracted);
+        if(!appliedKeys.length){
+          alert('PDFから必要な数値を抽出できませんでした。\n\nこの帳票は画像ベース出力の可能性があります。オフライン・完全自動で対応するには、PDF自体に文字情報が入っている必要があります。');
+          setOcrStatus('抽出失敗', false);
           return;
         }
-        applyData(extracted);
-        recalcStandard();
-        recalcAllComparisons();
-        setOcrStatus('OCR反映完了', false);
-        setTimeout(()=>setOcrStatus('', false), 2500);
-      } catch(err){
+        setOcrStatus(`反映完了: ${appliedKeys.length}項目`, false);
+      }catch(err){
         console.error(err);
-        alert('PDF OCR読込に失敗しました。PDFの品質（スキャンの解像度）やネットワーク接続をご確認ください。');
-        setOcrStatus('OCR失敗', false);
-        setTimeout(()=>setOcrStatus('', false), 2500);
+        alert('PDF読込中にエラーが発生しました。\n\nこの版はネット接続不要ですが、画像だけのPDFには対応できません。');
+        setOcrStatus('', false);
       }
     }
-
-    function wirePdfInput(){
-      const input = document.getElementById('stdPdfInput');
-      if(!input) return;
-      input.addEventListener('change', async () => {
-        const file = input.files && input.files[0];
-        if(!file) return;
-        await loadStdFromPdfOCR(file);
-        input.value = '';
-      });
-    }
-
-    function init(){
-      populateSelectors();
-      bindEvents();
-      wirePdfInput();
-      setTodayReiwa();
-      setValue('purposeText', DEFAULT_PURPOSE);
-      recalcStandard();
-      recalcAllComparisons();
-    }
-
-    init();
-  </script>
-</body>
-</html>

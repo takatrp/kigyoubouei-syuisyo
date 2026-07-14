@@ -6,53 +6,110 @@
   <title>企業防衛提案主意書</title>
   <style>
     :root{
-      --border:#222;
-      --grid:#d9dde5;
-      --bg:#eef2f7;
+      --border:#cbd5e1;
+      --grid:#dbe3ec;
+      --bg:#eef3f8;
       --paper:#fff;
-      --soft:#f7f9fc;
-      --soft-2:#f3f4f6;
-      --yellow:#ead43a;
-      --accent:#0b57d0;
-      --text:#111827;
-      --muted:#6b7280;
-      --danger:#9b1c1c;
+      --soft:#f6f8fb;
+      --soft-2:#edf2f7;
+      --accent:#0f4c81;
+      --accent-deep:#082f54;
+      --accent-soft:#eaf3fb;
+      --gold:#c99118;
+      --gold-soft:#fff8df;
+      --text:#172033;
+      --muted:#5f6b7b;
+      --danger:#b42318;
+      --success:#18794e;
     }
     *{box-sizing:border-box;}
-    body{margin:0;background:var(--bg);font-family:"Hiragino Sans","Yu Gothic","Meiryo",sans-serif;color:var(--text);}
+    html{scroll-behavior:smooth;}
+    body{margin:0;background:var(--bg);font-family:"Hiragino Sans","Yu Gothic","Meiryo",sans-serif;color:var(--text);line-height:1.55;}
+    button,input,textarea,select{font:inherit;color:inherit;}
+    button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,summary:focus-visible,a:focus-visible{
+      outline:3px solid rgba(25,118,210,.35);outline-offset:2px;
+    }
     .toolbar{
-      position:sticky;top:0;z-index:50;background:#fff;border-bottom:1px solid #d7dde7;
-      padding:12px 14px;display:flex;gap:8px;flex-wrap:wrap;
+      position:sticky;top:0;z-index:50;background:rgba(255,255,255,.97);border-bottom:1px solid #d7e0ea;
+      box-shadow:0 6px 18px rgba(15,76,129,.08);backdrop-filter:blur(10px);
     }
-    .toolbar button,.toolbar label.file-btn{
-      appearance:none;border:1px solid #c9d0da;background:#fff;border-radius:10px;
-      padding:10px 14px;font-size:14px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;
+    .toolbar-inner{
+      width:min(1320px, calc(100vw - 32px));margin:0 auto;padding:10px 0;
+      display:flex;justify-content:space-between;align-items:center;gap:18px;
     }
-    .toolbar button.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:700;}
-    .toolbar button.warn{border-color:#d6b04a;background:#fff9e6;}
+    .app-brand{display:flex;align-items:center;gap:10px;min-width:max-content;}
+    .brand-mark{
+      display:inline-flex;align-items:center;justify-content:center;background:var(--accent-deep);color:#fff;
+      border-radius:8px;padding:8px 10px;font-size:13px;font-weight:800;letter-spacing:.08em;
+    }
+    .brand-copy{display:flex;flex-direction:column;line-height:1.25;}
+    .brand-copy strong{font-size:17px;color:var(--accent-deep);}
+    .brand-copy small{font-size:11px;color:var(--muted);margin-top:2px;}
+    .toolbar-actions{display:flex;justify-content:flex-end;align-items:center;gap:8px;flex-wrap:wrap;}
+    .toolbar button,.toolbar label.file-btn,.more-actions summary{
+      appearance:none;border:1px solid #c8d3df;background:#fff;border-radius:9px;
+      padding:9px 13px;font-size:13px;line-height:1.2;cursor:pointer;display:inline-flex;align-items:center;gap:6px;
+      min-height:38px;transition:border-color .18s,background .18s,transform .18s;
+    }
+    .toolbar button:hover,.toolbar label.file-btn:hover,.more-actions summary:hover{border-color:#8ea6bc;background:#f8fbfe;}
+    .toolbar button.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:800;}
+    .toolbar button.primary:hover{background:var(--accent-deep);}
+    .toolbar button.warn{border-color:#dfbf72;background:#fffaf0;}
     .toolbar input[type="file"]{display:none;}
+    .more-actions{position:relative;}
+    .more-actions summary{list-style:none;font-weight:700;color:var(--accent-deep);}
+    .more-actions summary::-webkit-details-marker{display:none;}
+    .more-actions summary::after{content:"▼";font-size:9px;margin-left:3px;color:#64748b;}
+    .more-actions[open] summary::after{content:"▲";}
+    .more-panel{
+      position:absolute;right:0;top:calc(100% + 8px);width:min(620px, calc(100vw - 28px));padding:12px;
+      display:flex;flex-wrap:wrap;gap:8px;background:#fff;border:1px solid #d5dfeb;border-radius:12px;
+      box-shadow:0 16px 40px rgba(15,42,68,.18);
+    }
     .status{
       display:inline-flex; align-items:center; gap:8px;
       padding:8px 10px; border:1px solid #dbe2ea; background:#f8fafc;
       border-radius:10px; font-size:12px; color:#374151;
     }
     .status.hidden{display:none;}
-    .page{
-      width:min(1320px, calc(100vw - 24px));margin:16px auto 40px;background:var(--paper);
-      padding:26px 26px 34px;box-shadow:0 10px 30px rgba(0,0,0,.08);
+    .page{width:min(1280px, calc(100vw - 32px));margin:22px auto 48px;}
+    .workflow-nav{
+      display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;margin:0 0 14px;
     }
-    h1{margin:0 0 14px;text-align:center;font-size:34px;letter-spacing:.08em;}
+    .workflow-nav a{
+      color:#42526a;text-decoration:none;background:#fff;border:1px solid #d7e0ea;border-radius:999px;
+      padding:7px 12px;font-size:12px;font-weight:700;
+    }
+    .workflow-nav a:hover{color:var(--accent);border-color:#8eb4d5;background:var(--accent-soft);}
+    .doc-heading{
+      position:relative;overflow:hidden;text-align:center;color:#fff;padding:27px 24px 25px;border-radius:16px;
+      background:linear-gradient(120deg,var(--accent-deep),var(--accent) 68%,#2475a8);
+      box-shadow:0 16px 34px rgba(8,47,84,.16);margin-bottom:18px;
+    }
+    .doc-heading::after{content:"";position:absolute;width:220px;height:220px;border:46px solid rgba(255,255,255,.07);border-radius:50%;right:-70px;top:-115px;}
+    .doc-heading .eyebrow{position:relative;z-index:1;margin:0 0 5px;font-size:12px;font-weight:800;letter-spacing:.18em;color:#d8ebf8;}
+    h1{position:relative;z-index:1;margin:0;text-align:center;font-size:32px;letter-spacing:.08em;}
+    .doc-heading .lead{position:relative;z-index:1;margin:7px 0 0;font-size:14px;color:#e7f2fa;}
+    .section-panel,.summary-section{
+      background:var(--paper);border:1px solid #dbe3ec;border-radius:16px;padding:22px;
+      box-shadow:0 8px 24px rgba(15,42,68,.06);
+    }
+    .section-kicker{font-size:11px;font-weight:900;letter-spacing:.12em;color:var(--accent);margin-bottom:2px;}
+    .panel-title{font-size:21px;font-weight:850;color:var(--accent-deep);margin:0 0 16px;}
     .head-row{display:grid;grid-template-columns:1.1fr 1fr;gap:20px;align-items:start;margin-bottom:16px;}
     .line-field{display:flex;align-items:flex-end;gap:12px;}
     .line-field .label{font-size:24px;font-weight:700;white-space:nowrap;}
     .line-field .line{flex:1;border-bottom:2px solid #4b5563;min-height:38px;display:flex;align-items:flex-end;}
-    input,textarea,select{font:inherit;color:inherit;}
-    .line input,.inline-line input,.inline-line select{width:100%;border:none;outline:none;background:transparent;padding:6px 4px;}
+    .line input,.inline-line input{width:100%;border:none;background:transparent;padding:7px 6px;}
     .meta-box{padding-top:6px;}
-    .date-row,.person-row{display:flex;justify-content:flex-end;align-items:center;gap:8px;flex-wrap:wrap;font-size:16px;margin:8px 0;}
-    .inline-line{display:inline-flex;align-items:flex-end;min-height:32px;border-bottom:1px solid #4b5563;background:#fff;}
-    .inline-line.year{width:96px;}
-    .inline-line.sm{width:88px;}
+    .date-row,.person-row{display:flex;justify-content:flex-end;align-items:center;gap:8px;flex-wrap:wrap;font-size:15px;margin:8px 0;}
+    .field-label{font-weight:800;color:#334155;white-space:nowrap;}
+    .date-input{
+      min-width:176px;min-height:40px;border:1px solid #b8c6d6;border-radius:8px;background:#fff;padding:7px 10px;
+    }
+    .today-btn{border:1px solid #b8c6d6;background:#f8fbfe;color:var(--accent);border-radius:8px;padding:7px 10px;font-weight:800;cursor:pointer;}
+    .date-print{display:none;font-weight:700;}
+    .inline-line{display:inline-flex;align-items:flex-end;min-height:36px;border-bottom:1px solid #64748b;background:#fff;}
     .inline-line.long{width:180px;}
     select{
       width:100%;border:none;outline:none;background:transparent;padding:6px 26px 6px 4px;appearance:none;
@@ -60,67 +117,103 @@
       background-position:calc(100% - 15px) calc(50% - 2px), calc(100% - 9px) calc(50% - 2px);
       background-size:6px 6px,6px 6px;background-repeat:no-repeat;
     }
-    .top-grid{display:grid;grid-template-columns:1fr 1.4fr;gap:18px;align-items:start;margin-bottom:18px;}
+    .top-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:18px;align-items:stretch;margin-top:18px;}
+    .people-tables{min-width:0;}
+    .table-scroll{max-width:100%;overflow-x:auto;padding-bottom:2px;scrollbar-color:#8ea6bc #eef3f8;}
+    .people-table-wrap{max-width:100%;overflow-x:auto;}
     table{border-collapse:collapse;width:100%;table-layout:fixed;}
-    th,td{border:2px solid var(--border);padding:6px 8px;vertical-align:middle;}
-    th{font-weight:700;text-align:center;background:#fff;}
+    th,td{border:1px solid var(--border);padding:7px 8px;vertical-align:middle;}
+    th{font-weight:800;text-align:center;background:#f5f8fb;color:#24364b;}
     td{min-height:40px;height:40px;}
-    .mini th,.mini td{font-size:14px;min-height:36px;height:36px;}
-    .mini td input,.mini td select{width:100%;border:none;outline:none;background:transparent;padding:4px;}
+    .mini{min-width:560px;}
+    .mini.attendee-table{margin-top:10px;width:100%;}
+    .mini th,.mini td{font-size:13px;min-height:42px;height:42px;}
+    .mini td input{width:100%;border:none;background:transparent;padding:6px;}
+    .mini td select{
+      width:100%;border:1px solid #b9c7d6;border-radius:7px;background-color:#f8fbfe;min-height:34px;padding:5px 24px 5px 7px;
+    }
     .check-cell{text-align:center;}
     .check-cell input{transform:scale(1.1);}
-    .purpose-box{border:2px solid var(--border);}
-    .purpose-title{background:var(--yellow);border-bottom:2px solid var(--border);padding:8px 10px;text-align:center;font-size:28px;font-weight:800;}
-    .purpose-body{background:var(--yellow);padding:12px;min-height:200px;}
-    .purpose-body textarea{width:100%;min-height:170px;border:none;outline:none;background:transparent;line-height:1.8;resize:vertical;}
-    .section{margin-top:18px;}
-    .section-title{font-size:24px;font-weight:800;margin:0 0 8px;display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;}
-    .subtext{font-size:12px;color:var(--muted);font-weight:500;}
+    .purpose-box{border:1px solid #e8cf8b;border-left:6px solid var(--gold);border-radius:12px;overflow:hidden;background:var(--gold-soft);}
+    .purpose-title{padding:10px 14px;text-align:left;font-size:19px;color:#57400b;font-weight:850;border-bottom:1px solid #eedca8;}
+    .purpose-body{padding:12px 14px;min-height:200px;}
+    .purpose-body textarea{width:100%;min-height:168px;border:none;background:transparent;line-height:1.85;resize:vertical;}
+    .section{margin-top:18px;scroll-margin-top:92px;}
+    .section-title{font-size:22px;color:var(--accent-deep);font-weight:850;margin:0 0 13px;display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;}
+    .subtext{font-size:13px;color:var(--muted);font-weight:600;}
     .grid-2{display:grid;grid-template-columns:1.15fr .85fr;gap:16px;}
-    .hint-box{border:1px solid #d8dee8;background:var(--soft);padding:10px 12px;border-radius:10px;font-size:12px;line-height:1.65;color:#374151;margin-top:8px;}
+    .hint-box{border:1px solid #d8e2ec;background:var(--soft);padding:11px 13px;border-radius:10px;font-size:13px;line-height:1.65;color:#42526a;margin-top:10px;}
     .std-table .item{font-weight:700;}
     .std-table .formula{display:block;color:#374151;font-size:12px;font-weight:500;line-height:1.45;margin-top:2px;}
     .std-table .sum-row th,.std-table .sum-row td{font-weight:800;background:#fcfcfc;}
     .std-table .group-row td{background:#f7f7f7;font-weight:800;}
     .amount-wrap{display:flex;align-items:center;gap:4px;min-height:28px;}
-    .amount-wrap input{flex:1;min-width:0;text-align:right;border:none;outline:none;background:transparent;padding:4px;}
+    .amount-wrap input{flex:1;min-width:0;text-align:right;border:none;background:transparent;padding:5px;}
     .amount-unit{font-size:12px;color:#374151;white-space:nowrap;}
     .readonly{background:#f8fafc;}
     .scenario-table th,.scenario-table td{text-align:center;}
     .scenario-table .row-title{text-align:left;font-weight:700;}
-    .cards{display:grid;grid-template-columns:repeat(5, minmax(120px, 1fr));gap:10px;}
-    .card{border:1px solid #d6dde7;background:#f8fafc;border-radius:12px;padding:10px 12px;}
-    .card .label{font-size:12px;color:var(--muted);margin-bottom:4px;}
-    .card .value{font-size:24px;font-weight:800;line-height:1.1;}
+    .summary-section{margin-top:18px;background:linear-gradient(135deg,#f7fbff,#fff);}
+    .summary-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:13px;}
+    .summary-head h2{margin:0;color:var(--accent-deep);font-size:21px;}
+    .summary-head p{margin:0;color:var(--muted);font-size:13px;}
+    .cards{display:grid;grid-template-columns:repeat(5,minmax(135px,1fr));gap:10px;}
+    .card{border:1px solid #d5e0ea;background:#fff;border-radius:12px;padding:12px 13px;box-shadow:0 3px 10px rgba(15,42,68,.04);}
+    .card.gap-card{border-top:4px solid #8ca2b6;}
+    .card .label{font-size:12px;color:var(--muted);margin-bottom:5px;font-weight:700;}
+    .card .value{font-size:21px;font-weight:850;line-height:1.2;color:var(--accent-deep);}
+    .card .value.state-shortage{color:var(--danger);}
+    .card .value.state-balanced{color:#52606d;}
+    .card .value.state-surplus{color:var(--success);}
     .danger{color:var(--danger);}
     .insurer-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 6px;}
-    .insurer-head .name{font-size:20px;font-weight:800;}
+    .insurer-head .name{font-size:20px;color:var(--accent-deep);font-weight:850;}
     .controls{display:flex;gap:8px;flex-wrap:wrap;}
     .controls button{border:1px solid #cdd5df;background:#fff;border-radius:8px;padding:8px 10px;cursor:pointer;}
     .gray{background:var(--soft-2);}
     .black{background:#111;color:#fff;}
     .center{text-align:center;}
     .left{text-align:left;}
-    .small{font-size:12px;line-height:1.35;}
-    .tiny{font-size:11px;line-height:1.3;}
+    .small{font-size:13px;line-height:1.4;}
+    .tiny{font-size:12px;line-height:1.35;}
     .note-list{margin-top:8px;font-size:12px;color:#4b5563;line-height:1.65;}
     .json-area{display:none;}
-    .footer-note{margin-top:14px;font-size:12px;color:#4b5563;line-height:1.7;border:1px solid #d8dee8;background:#fafcff;padding:10px 12px;border-radius:10px;}
+    .insurer-table{min-width:1040px;}
+    .insurer-table td > input{width:100%;min-width:0;border:none;background:transparent;padding:5px;}
+    .insurer-table .type-input{min-width:68px;text-align:center;background:#fff;}
+    .std-table{min-width:640px;}
+    .scenario-table{min-width:610px;}
+    .footer-note{margin-top:18px;font-size:13px;color:#4b5563;line-height:1.7;border:1px solid #d8e2ec;background:#fafcff;padding:12px 14px;border-radius:10px;}
     @media (max-width: 1080px){
+      .toolbar-inner{align-items:flex-start;}
+      .brand-copy small{display:none;}
       .head-row,.top-grid,.grid-2{grid-template-columns:1fr;}
-      .cards{grid-template-columns:1fr 1fr;}
+      .cards{grid-template-columns:repeat(3,1fr);}
+      .date-row,.person-row{justify-content:flex-start;}
     }
     @media (max-width: 700px){
-      .page{padding:16px; width:min(100vw - 10px, 1320px);} 
-      h1{font-size:28px;}
+      .toolbar-inner{width:calc(100vw - 20px);flex-direction:column;gap:8px;}
+      .toolbar-actions{width:100%;justify-content:flex-start;}
+      .toolbar button,.more-actions summary{padding:8px 10px;}
+      .page{width:calc(100vw - 16px);margin-top:12px;}
+      .doc-heading{padding:22px 14px;border-radius:12px;}
+      h1{font-size:25px;}
+      .doc-heading .lead{font-size:12px;}
+      .section-panel,.summary-section{padding:15px;border-radius:12px;}
       .line-field .label{font-size:18px;}
       .purpose-title{font-size:20px;}
       .cards{grid-template-columns:1fr;}
+      .workflow-nav{justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap;padding-bottom:4px;}
+      .workflow-nav a{white-space:nowrap;}
     }
     @media print{
+      @page{size:A4 landscape;margin:8mm;}
       body{background:#fff;}
-      .toolbar,.controls,.footer-note{display:none !important;}
-      .page{width:100%;margin:0;box-shadow:none;padding:8mm;}
+      .toolbar,.workflow-nav,.controls,.footer-note,.today-btn{display:none !important;}
+      .page{width:100%;margin:0;box-shadow:none;padding:0;}
+      .doc-heading{background:#fff;color:#111;box-shadow:none;border-radius:0;padding:0 0 7mm;}
+      .doc-heading .eyebrow,.doc-heading .lead{color:#333;}
+      .section-panel,.summary-section{box-shadow:none;border-color:#777;border-radius:0;padding:5mm;break-inside:avoid;}
       h1{font-size:24px;margin-bottom:8px;}
       .section-title{font-size:18px;}
       th,td{border-width:1px;padding:4px 5px;}
@@ -130,50 +223,83 @@
       .cards{grid-template-columns:repeat(5, 1fr);}
       .card{padding:6px 8px;border-radius:8px;}
       .card .value{font-size:16px;}
+      .date-input{display:none;}
+      .date-print{display:inline;}
+      .table-scroll,.people-table-wrap{overflow:visible;}
+      .insurer-table,.std-table,.scenario-table,.mini{min-width:0;}
+      select{background-image:none;padding-right:4px;}
     }
   </style>
 </head>
 <body>
-  <div class="toolbar">
-    <button class="primary" type="button" onclick="saveData()">保存</button>
-    <button type="button" onclick="loadData()">読込</button>
-    <button type="button" onclick="window.print()">印刷</button>
-    <button type="button" onclick="loadExampleForm()">記載例読込</button>
-    <button class="warn" type="button" onclick="loadStdSampleValues()">標準保障額サンプル読込</button>
-    <label class="file-btn warn" title="PDFを選択してオフライン読込">PDF読込(オフライン)
-      <input id="stdPdfInput" type="file" accept="application/pdf" />
-    </label>
-    <span id="ocrStatus" class="status hidden">OCR待機</span>
-    <button type="button" onclick="importStdJsonPrompt()">標準保障額JSON取込</button>
-    <button type="button" onclick="downloadStdJson()">標準保障額JSON出力</button>
-    <button type="button" onclick="downloadAllJson()">全体JSON出力</button>
-    <button type="button" onclick="clearForm()">初期化</button>
-  </div>
+  <header class="toolbar">
+    <div class="toolbar-inner">
+      <div class="app-brand" aria-label="企業防衛提案主意書">
+        <span class="brand-mark">企業防衛</span>
+        <span class="brand-copy"><strong>提案主意書</strong><small>必要保障額と既加入保障を一つの画面で確認</small></span>
+      </div>
+      <div class="toolbar-actions" aria-label="主要操作">
+        <button class="primary" type="button" onclick="saveData()">保存</button>
+        <button type="button" onclick="loadData()">読込</button>
+        <button type="button" onclick="window.print()">印刷</button>
+        <details class="more-actions">
+          <summary>データ連携・その他</summary>
+          <div class="more-panel">
+            <button type="button" onclick="loadExampleForm()">記載例読込</button>
+            <button class="warn" type="button" onclick="loadStdSampleValues()">標準保障額サンプル読込</button>
+            <label class="file-btn warn" title="埋込文字を優先し、必要に応じて画像OCRを実行">標準保障額PDF読込
+              <input id="stdPdfInput" type="file" accept="application/pdf" />
+            </label>
+            <span id="ocrStatus" class="status hidden" role="status">OCR待機</span>
+            <button type="button" onclick="importStdJsonPrompt()">標準保障額JSON取込</button>
+            <button type="button" onclick="downloadStdJson()">標準保障額JSON出力</button>
+            <button type="button" onclick="downloadAllJson()">全体JSON出力</button>
+            <button type="button" onclick="clearForm()">初期化</button>
+          </div>
+        </details>
+      </div>
+    </div>
+  </header>
 
   <div class="page">
-    <h1>企業防衛提案主意書</h1>
+    <nav class="workflow-nav" aria-label="入力の流れ">
+      <a href="#basic">1 基本情報</a>
+      <a href="#summary">2 過不足確認</a>
+      <a href="#standard">3 標準保障額</a>
+      <a href="#coverage">4 加入状況</a>
+    </nav>
+
+    <div class="doc-heading">
+      <p class="eyebrow">BUSINESS PROTECTION REVIEW</p>
+      <h1>企業防衛提案主意書</h1>
+      <p class="lead">経営者・幹部の万一に備え、必要保障額と現在の備えを見える化します。</p>
+    </div>
+
+    <section class="section-panel" id="basic">
+      <div class="section-kicker">STEP 1</div>
+      <h2 class="panel-title">基本情報と確認対象者</h2>
 
     <div class="head-row">
       <div class="line-field">
         <div class="label">関与先名</div>
-        <div class="line"><input data-key="clientName" /></div>
+        <div class="line"><input data-key="clientName" aria-label="関与先名" /></div>
       </div>
       <div class="meta-box">
         <div class="date-row">
-          <span>令和</span>
-          <span class="inline-line year"><select id="reYear" data-key="reYear"></select></span><span>年</span>
-          <span class="inline-line sm"><select id="reMonth" data-key="reMonth"></select></span><span>月</span>
-          <span class="inline-line sm"><select id="reDay" data-key="reDay"></select></span><span>日</span>
-          <span>記入</span>
+          <label class="field-label" for="entryDate">作成日</label>
+          <input class="date-input" id="entryDate" type="date" data-key="entryDate" />
+          <button class="today-btn" type="button" onclick="setTodayDate()">今日</button>
+          <span class="date-print" id="entryDatePrint"></span>
         </div>
         <div class="person-row">
-          <span>（担当：</span><span class="inline-line long"><input data-key="staffName"></span><span>）</span>
+          <label class="field-label" for="staffName">担当者</label><span class="inline-line long"><input id="staffName" data-key="staffName" aria-label="担当者名"></span>
         </div>
       </div>
     </div>
 
     <div class="top-grid">
-      <div>
+      <div class="people-tables">
+        <div class="people-table-wrap">
         <table class="mini">
           <colgroup>
             <col style="width:42%"><col style="width:18%"><col style="width:22%"><col style="width:18%">
@@ -185,32 +311,34 @@
             <th>対象</th>
           </tr>
           <tr>
-            <td><input data-key="target1_name"></td>
+            <td><input data-key="target1_name" aria-label="対象者1 氏名"></td>
             <td><select data-key="target1_relation" class="relation-select"></select></td>
             <td><select data-key="target1_role" class="role-select"></select></td>
             <td class="check-cell"><input type="checkbox" data-key="target1_checked"></td>
           </tr>
           <tr>
-            <td><input data-key="target2_name"></td>
+            <td><input data-key="target2_name" aria-label="対象者2 氏名"></td>
             <td><select data-key="target2_relation" class="relation-select"></select></td>
             <td><select data-key="target2_role" class="role-select"></select></td>
             <td class="check-cell"><input type="checkbox" data-key="target2_checked"></td>
           </tr>
           <tr>
-            <td><input data-key="target3_name"></td>
+            <td><input data-key="target3_name" aria-label="対象者3 氏名"></td>
             <td><select data-key="target3_relation" class="relation-select"></select></td>
             <td><select data-key="target3_role" class="role-select"></select></td>
             <td class="check-cell"><input type="checkbox" data-key="target3_checked"></td>
           </tr>
           <tr>
-            <td><input data-key="target4_name"></td>
+            <td><input data-key="target4_name" aria-label="対象者4 氏名"></td>
             <td><select data-key="target4_relation" class="relation-select"></select></td>
             <td><select data-key="target4_role" class="role-select"></select></td>
             <td class="check-cell"><input type="checkbox" data-key="target4_checked"></td>
           </tr>
         </table>
+        </div>
 
-        <table class="mini" style="margin-top:8px; width:82%;">
+        <div class="people-table-wrap">
+        <table class="mini attendee-table">
           <colgroup>
             <col style="width:48%"><col style="width:26%"><col style="width:26%">
           </colgroup>
@@ -220,16 +348,17 @@
             <th>役職</th>
           </tr>
           <tr>
-            <td><input data-key="attendee1_name"></td>
+            <td><input data-key="attendee1_name" aria-label="同席者1 氏名"></td>
             <td><select data-key="attendee1_relation" class="relation-select"></select></td>
             <td><select data-key="attendee1_role" class="role-select"></select></td>
           </tr>
           <tr>
-            <td><input data-key="attendee2_name"></td>
+            <td><input data-key="attendee2_name" aria-label="同席者2 氏名"></td>
             <td><select data-key="attendee2_relation" class="relation-select"></select></td>
             <td><select data-key="attendee2_role" class="role-select"></select></td>
           </tr>
         </table>
+        </div>
       </div>
 
       <div class="purpose-box">
@@ -239,14 +368,29 @@
         </div>
       </div>
     </div>
+    </section>
 
-    <div class="section">
+    <section class="summary-section" id="summary">
+      <div class="summary-head">
+        <h2>企業防衛サマリー</h2>
+        <p>標準保障額と既加入保障の差を、3つのリスクごとに確認できます。</p>
+      </div>
+      <div class="cards" aria-live="polite">
+        <div class="card gap-card"><div class="label">死亡時の保障</div><div class="value state-balanced" id="cardGapDeath">差額 0万円</div></div>
+        <div class="card gap-card"><div class="label">就業障がい時の保障</div><div class="value state-balanced" id="cardGapDisability">差額 0万円</div></div>
+        <div class="card gap-card"><div class="label">重大疾病時の保障</div><div class="value state-balanced" id="cardGapCritical">差額 0万円</div></div>
+        <div class="card"><div class="label">大同生命 既加入合計</div><div class="value" id="cardDaidouTotal">0万円</div></div>
+        <div class="card"><div class="label">他社 既加入合計</div><div class="value" id="cardOtherTotal">0万円</div></div>
+      </div>
+    </section>
+
+    <section class="section section-panel" id="standard">
       <div class="section-title">
         <span>標準保障額</span>
         <span class="subtext">添付の標準保障額算定書との連携を見据えた入力欄です。</span>
       </div>
       <div class="grid-2">
-        <div>
+        <div class="table-scroll">
           <table class="std-table">
             <colgroup>
               <col style="width:48%"><col style="width:18%"><col style="width:34%">
@@ -284,7 +428,7 @@
             <tr class="group-row">
               <td>A．企業防衛準備資金［社内留保］</td>
               <td><div class="amount-wrap"><input class="amount-input readonly std-field" data-key="std_A" data-std-json="A" readonly><span class="amount-unit">万円</span></div></td>
-              <td class="tiny">①〜⑤の合計</td>
+              <td class="tiny">①〜⑤を自動計算</td>
             </tr>
             <tr>
               <td class="item">⑥役員退職慰労金<span class="formula">（報酬月額×在任年数×功績倍率）</span></td>
@@ -304,17 +448,17 @@
             <tr class="group-row">
               <td>B．役員退職慰労金準備資金［社外支出］</td>
               <td><div class="amount-wrap"><input class="amount-input readonly std-field" data-key="std_B" data-std-json="B" readonly><span class="amount-unit">万円</span></div></td>
-              <td class="tiny">⑥〜⑧の合計</td>
+              <td class="tiny">⑥〜⑧を自動計算</td>
             </tr>
             <tr class="sum-row">
               <td>標準保障額［A＋B］</td>
               <td><div class="amount-wrap"><input class="amount-input readonly std-field" data-key="std_total" data-std-json="total" readonly><span class="amount-unit">万円</span></div></td>
-              <td class="tiny">死亡の場合の基準値</td>
+              <td class="tiny">A＋Bを自動計算</td>
             </tr>
           </table>
         </div>
 
-        <div>
+        <div class="table-scroll">
           <table class="scenario-table">
             <colgroup>
               <col style="width:34%"><col style="width:22%"><col style="width:22%"><col style="width:22%">
@@ -362,25 +506,19 @@
             <div>・重大疾病の場合は、標準保障額算定書の数値を優先するため手入力可能にしています。</div>
             <div>・大同生命・他社の各シナリオ金額は、各明細表の「明細から集計」ボタンで反映できます。</div>
           </div>
-          <div class="cards" style="margin-top:10px;">
-            <div class="card"><div class="label">死亡 過不足額</div><div class="value danger" id="cardGapDeath">0万円</div></div>
-            <div class="card"><div class="label">就業障がい 過不足額</div><div class="value danger" id="cardGapDisability">0万円</div></div>
-            <div class="card"><div class="label">重大疾病 過不足額</div><div class="value danger" id="cardGapCritical">0万円</div></div>
-            <div class="card"><div class="label">大同生命 既加入合計</div><div class="value" id="cardDaidouTotal">0万円</div></div>
-            <div class="card"><div class="label">他社 既加入合計</div><div class="value" id="cardOtherTotal">0万円</div></div>
-          </div>
         </div>
       </div>
-    </div>
+    </section>
 
-    <div class="section">
+    <section class="section section-panel" id="coverage">
       <div class="insurer-head">
         <div class="name">大同生命</div>
         <div class="controls">
           <button type="button" onclick="aggregateInsurer('daidou')">明細から集計</button>
         </div>
       </div>
-      <table>
+      <div class="table-scroll">
+      <table class="insurer-table">
         <colgroup>
           <col style="width:9%"><col style="width:14%"><col style="width:8%"><col style="width:8%"><col style="width:8%"><col style="width:8%"><col style="width:8%"><col style="width:8%"><col style="width:8%"><col style="width:8%"><col style="width:13%">
         </colgroup>
@@ -450,6 +588,32 @@
           <td><input data-key="daidou_disability_note"></td>
         </tr>
         <tr>
+          <th>医療</th>
+          <td class="small">入院・手術等</td>
+          <td class="center gray">－</td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="daidou_medical_amount"><span class="amount-unit">万</span></div></td>
+          <td class="black"></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="daidou_medical_use1"><span class="amount-unit">万</span></div></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="daidou_medical_use2"><span class="amount-unit">万</span></div></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="daidou_medical_use3"><span class="amount-unit">万</span></div></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="daidou_medical_use4"><span class="amount-unit">万</span></div></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="daidou_medical_use5"><span class="amount-unit">万</span></div></td>
+          <td><input data-key="daidou_medical_note" aria-label="大同生命 医療 備考"></td>
+        </tr>
+        <tr>
+          <th>介護</th>
+          <td class="small">要介護等</td>
+          <td class="center gray">－</td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="daidou_care_amount"><span class="amount-unit">万</span></div></td>
+          <td class="black"></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="daidou_care_use1"><span class="amount-unit">万</span></div></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="daidou_care_use2"><span class="amount-unit">万</span></div></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="daidou_care_use3"><span class="amount-unit">万</span></div></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="daidou_care_use4"><span class="amount-unit">万</span></div></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="daidou_care_use5"><span class="amount-unit">万</span></div></td>
+          <td><input data-key="daidou_care_note" aria-label="大同生命 介護 備考"></td>
+        </tr>
+        <tr>
           <th>生存退職</th>
           <td></td>
           <td class="center gray">返戻金有</td>
@@ -463,20 +627,22 @@
           <td><input data-key="daidou_retire_note"></td>
         </tr>
       </table>
+      </div>
       <div class="hint-box">
         比較用シナリオ金額：
         死亡＝死亡欄、就業障がい＝重大疾病（長期療養）＋障害、重大疾病＝重大疾病（長期療養）＋重大疾病（短期療養）として集計します。必要に応じて上の標準保障額比較表側で調整してください。
       </div>
-    </div>
+    </section>
 
-    <div class="section">
+    <section class="section section-panel">
       <div class="insurer-head">
         <div class="name">他社</div>
         <div class="controls">
           <button type="button" onclick="aggregateInsurer('other')">明細から集計</button>
         </div>
       </div>
-      <table>
+      <div class="table-scroll">
+      <table class="insurer-table">
         <colgroup>
           <col style="width:9%"><col style="width:14%"><col style="width:8%"><col style="width:8%"><col style="width:8%"><col style="width:8%"><col style="width:8%"><col style="width:8%"><col style="width:8%"><col style="width:8%"><col style="width:13%">
         </colgroup>
@@ -499,7 +665,7 @@
         <tr>
           <th>死亡</th>
           <td></td>
-          <td class="center">Lα、R</td>
+          <td><input class="type-input" data-key="other_death_type" aria-label="他社 死亡 タイプ"></td>
           <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="other_death_amount"><span class="amount-unit">万</span></div></td>
           <td class="black"></td>
           <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="other_death_use1"><span class="amount-unit">万</span></div></td>
@@ -512,7 +678,7 @@
         <tr>
           <th rowspan="2">重大疾病</th>
           <td class="small">就業不能<br>（長期療養）</td>
-          <td class="center">新J、J</td>
+          <td><input class="type-input" data-key="other_critical_long_type" aria-label="他社 重大疾病 長期療養 タイプ"></td>
           <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="other_critical_long_amount"><span class="amount-unit">万</span></div></td>
           <td class="black" rowspan="3"></td>
           <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="other_critical_long_use1"><span class="amount-unit">万</span></div></td>
@@ -524,7 +690,7 @@
         </tr>
         <tr>
           <td class="small">一時離脱<br>（短期療養）</td>
-          <td class="center">J、J特約</td>
+          <td><input class="type-input" data-key="other_critical_short_type" aria-label="他社 重大疾病 短期療養 タイプ"></td>
           <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="other_critical_short_amount"><span class="amount-unit">万</span></div></td>
           <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="other_critical_short_use1"><span class="amount-unit">万</span></div></td>
           <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="other_critical_short_use2"><span class="amount-unit">万</span></div></td>
@@ -536,7 +702,7 @@
         <tr>
           <th>障害</th>
           <td class="small">障害等による<br>就業不能</td>
-          <td class="center">T</td>
+          <td><input class="type-input" data-key="other_disability_type" aria-label="他社 障害 タイプ"></td>
           <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="other_disability_amount"><span class="amount-unit">万</span></div></td>
           <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="other_disability_use1"><span class="amount-unit">万</span></div></td>
           <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="other_disability_use2"><span class="amount-unit">万</span></div></td>
@@ -546,9 +712,35 @@
           <td><input data-key="other_disability_note"></td>
         </tr>
         <tr>
+          <th>医療</th>
+          <td class="small">入院・手術等</td>
+          <td><input class="type-input" data-key="other_medical_type" aria-label="他社 医療 タイプ"></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="other_medical_amount"><span class="amount-unit">万</span></div></td>
+          <td class="black"></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="other_medical_use1"><span class="amount-unit">万</span></div></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="other_medical_use2"><span class="amount-unit">万</span></div></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="other_medical_use3"><span class="amount-unit">万</span></div></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="other_medical_use4"><span class="amount-unit">万</span></div></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="other_medical_use5"><span class="amount-unit">万</span></div></td>
+          <td><input data-key="other_medical_note" aria-label="他社 医療 備考"></td>
+        </tr>
+        <tr>
+          <th>介護</th>
+          <td class="small">要介護等</td>
+          <td><input class="type-input" data-key="other_care_type" aria-label="他社 介護 タイプ"></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="other_care_amount"><span class="amount-unit">万</span></div></td>
+          <td class="black"></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="other_care_use1"><span class="amount-unit">万</span></div></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="other_care_use2"><span class="amount-unit">万</span></div></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="other_care_use3"><span class="amount-unit">万</span></div></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="other_care_use4"><span class="amount-unit">万</span></div></td>
+          <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="other_care_use5"><span class="amount-unit">万</span></div></td>
+          <td><input data-key="other_care_note" aria-label="他社 介護 備考"></td>
+        </tr>
+        <tr>
           <th>生存退職</th>
           <td></td>
-          <td class="center gray">返戻金有</td>
+          <td><input class="type-input" data-key="other_retire_type" aria-label="他社 生存退職 タイプ"></td>
           <td class="black"></td>
           <td class="gray center small">退職想定年齢<br><input data-key="other_retire_age" style="width:56px;text-align:center;border:none;outline:none;background:transparent;">歳</td>
           <td><div class="amount-wrap"><input class="amount-input insurer-amount" data-key="other_retire_use1"><span class="amount-unit">万</span></div></td>
@@ -559,7 +751,8 @@
           <td><input data-key="other_retire_note"></td>
         </tr>
       </table>
-    </div>
+      </div>
+    </section>
 
     <div class="footer-note">
       この版は、クライアントと同じ画面を見ながら「標準保障額」と「既加入保険金額」を比較し、不足額を共有する用途に寄せています。保険金額欄は数字のみ・万単位・リアルタイムコンマ表示です。標準保障額のサンプル値は、添付の標準保障額算定書に対応する値を呼び出せるようにしています。
@@ -583,20 +776,6 @@
       'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js',
       'https://unpkg.com/tesseract.js@5/dist/tesseract.min.js'
     ];
-    const TESSERACT_WORKER_CANDIDATES = [
-      'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/worker.min.js',
-      'https://unpkg.com/tesseract.js@5/dist/worker.min.js'
-    ];
-    const TESSERACT_CORE_CANDIDATES = [
-      'https://cdn.jsdelivr.net/npm/tesseract.js-core@5',
-      'https://unpkg.com/tesseract.js-core@5'
-    ];
-    const TESSERACT_LANG_CANDIDATES = [
-      'https://cdn.jsdelivr.net/npm/@tesseract.js-data/jpn/4.0.0_best',
-      'https://cdn.jsdelivr.net/npm/@tesseract.js-data/jpn/4.0.0_fast',
-      'https://tessdata.projectnaptha.com/4.0.0'
-    ];
-
     async function loadScriptWithFallback(urls){
       let lastErr = null;
       for(const url of urls){
@@ -645,63 +824,13 @@
       throw lastErr || new Error('tesseract load failed');
     }
 
-    async function recognizeWithFallback(TesseractLib, canvas, logger){
-      const configs = [
-        {
-          workerPath: TESSERACT_WORKER_CANDIDATES[0],
-          corePath: TESSERACT_CORE_CANDIDATES[0],
-          langPath: TESSERACT_LANG_CANDIDATES[0]
-        },
-        {
-          workerPath: TESSERACT_WORKER_CANDIDATES[1],
-          corePath: TESSERACT_CORE_CANDIDATES[1],
-          langPath: TESSERACT_LANG_CANDIDATES[0]
-        },
-        {
-          workerPath: TESSERACT_WORKER_CANDIDATES[0],
-          corePath: TESSERACT_CORE_CANDIDATES[0],
-          langPath: TESSERACT_LANG_CANDIDATES[1]
-        },
-        {
-          workerPath: TESSERACT_WORKER_CANDIDATES[1],
-          corePath: TESSERACT_CORE_CANDIDATES[1],
-          langPath: TESSERACT_LANG_CANDIDATES[1]
-        },
-        {
-          workerPath: TESSERACT_WORKER_CANDIDATES[0],
-          corePath: TESSERACT_CORE_CANDIDATES[0],
-          langPath: TESSERACT_LANG_CANDIDATES[2]
-        },
-        {
-          workerPath: TESSERACT_WORKER_CANDIDATES[1],
-          corePath: TESSERACT_CORE_CANDIDATES[1],
-          langPath: TESSERACT_LANG_CANDIDATES[2]
-        }
-      ];
-      const startIndex = window.__tesseractLoadedFromIndex || 0;
-      const ordered = configs.sort((a,b)=>{
-        const ad = (a.workerPath === TESSERACT_WORKER_CANDIDATES[startIndex]) ? 0 : 1;
-        const bd = (b.workerPath === TESSERACT_WORKER_CANDIDATES[startIndex]) ? 0 : 1;
-        return ad - bd;
-      });
-      let lastErr = null;
-      for(const cfg of ordered){
-        try{
-          return await TesseractLib.recognize(canvas, 'jpn', {...cfg, logger});
-        }catch(err){
-          console.error('Tesseract retrying with another CDN/path', cfg, err);
-          lastErr = err;
-        }
-      }
-      throw lastErr || new Error('OCR failed');
-    }
-
   </script>
 
   <script>
-    const STORAGE_KEY = 'enterprise_defense_form_v4';
-    const RELATIONS = ['', '本人', '配偶者', '子', '父', '母', '兄', '弟', '姉', '妹', '役員', '後継者', 'その他'];
-    const ROLES = ['', '社長', '会長', '取締役', '代表取締役', '専務', '常務', '執行役員', '部長', '後継者', '配偶者', 'その他'];
+    const STORAGE_KEY = 'enterprise_defense_form_v5';
+    const LEGACY_STORAGE_KEYS = ['enterprise_defense_form_v4'];
+    const RELATIONS = ['本人', '配偶者', '子', '長男', '次男', '長女', '次女', '父', '母', '兄', '弟', '姉', '妹', 'その他'];
+    const ROLES = ['代表取締役', '社長', '会長', '副社長', '専務', '常務', '取締役', '監査役', '執行役員', '部長', '後継者候補', '従業員', 'その他'];
 
     const DEFAULT_PURPOSE = '経営においては、経営者・幹部の万一の場合に備えて、生命保険によるリスク対策が必要です。貴社の対策の現状及び既加入契約の目的を整理し、保険金使途を明確にすることにより過不足なくリスク対策が講じられているかを事務所担当者と一緒にご確認をお願い致します。';
 
@@ -734,22 +863,27 @@
     };
 
     function fillSelect(select, items){
-      select.innerHTML = items.map(v => `<option value="${escapeAttr(v)}">${escapeHtml(v || '　')}</option>`).join('');
+      const placeholder = '<option value="">未選択</option>';
+      select.innerHTML = placeholder + items.map(v => `<option value="${escapeAttr(v)}">${escapeHtml(v)}</option>`).join('');
     }
 
     function populateSelectors(){
-      document.querySelectorAll('.relation-select').forEach(s => fillSelect(s, RELATIONS));
-      document.querySelectorAll('.role-select').forEach(s => fillSelect(s, ROLES));
-      const y = document.getElementById('reYear');
-      const m = document.getElementById('reMonth');
-      const d = document.getElementById('reDay');
-      const years = [''];
-      for(let i=1;i<=20;i++) years.push(String(i));
-      const months = [''];
-      for(let i=1;i<=12;i++) months.push(String(i));
-      const days = [''];
-      for(let i=1;i<=31;i++) days.push(String(i));
-      fillSelect(y, years); fillSelect(m, months); fillSelect(d, days);
+      document.querySelectorAll('.relation-select').forEach(s => {
+        fillSelect(s, RELATIONS);
+        s.setAttribute('aria-label', fieldLabelFromKey(s.dataset.key, '続柄'));
+      });
+      document.querySelectorAll('.role-select').forEach(s => {
+        fillSelect(s, ROLES);
+        s.setAttribute('aria-label', fieldLabelFromKey(s.dataset.key, '役職'));
+      });
+    }
+
+    function fieldLabelFromKey(key='', suffix=''){
+      const target = key.match(/^target(\d+)_/);
+      if(target) return `対象者${target[1]} ${suffix}`;
+      const attendee = key.match(/^attendee(\d+)_/);
+      if(attendee) return `同席者${attendee[1]} ${suffix}`;
+      return suffix;
     }
 
     function escapeHtml(value=''){
@@ -804,6 +938,12 @@
       const el = getField(key);
       if(!el) return;
       if(el.type === 'checkbox'){ el.checked = !!value; return; }
+      if(el.tagName === 'SELECT' && value && !Array.from(el.options).some(option => option.value === String(value))){
+        const savedOption = document.createElement('option');
+        savedOption.value = String(value);
+        savedOption.textContent = `${value}（保存値）`;
+        el.appendChild(savedOption);
+      }
       el.value = value ?? '';
       if(el.classList.contains('amount-input')) sanitizeAmountInput(el);
     }
@@ -812,21 +952,59 @@
       return el.value;
     }
 
-    function setTodayReiwa(){
-      const now = new Date();
-      setValue('reYear', String(now.getFullYear() - 2018));
-      setValue('reMonth', String(now.getMonth() + 1));
-      setValue('reDay', String(now.getDate()));
+    function isoDateFromReiwa(year, month, day){
+      const westernYear = Number(year) + 2018;
+      const m = Number(month);
+      const d = Number(day);
+      if(!Number.isInteger(westernYear) || !Number.isInteger(m) || !Number.isInteger(d)) return '';
+      const candidate = new Date(westernYear, m - 1, d);
+      if(candidate.getFullYear() !== westernYear || candidate.getMonth() !== m - 1 || candidate.getDate() !== d) return '';
+      return `${westernYear}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
     }
+
+    function legacyDateParts(isoDate){
+      const match = String(isoDate || '').match(/^(\d{4})-(\d{2})-(\d{2})$/);
+      if(!match) return {};
+      return {reYear:String(Number(match[1]) - 2018), reMonth:String(Number(match[2])), reDay:String(Number(match[3]))};
+    }
+
+    function formatJapaneseDate(isoDate){
+      const parts = legacyDateParts(isoDate);
+      if(!parts.reYear) return '作成日：未選択';
+      return `令和${parts.reYear}年${parts.reMonth}月${parts.reDay}日`;
+    }
+
+    function updateDateDisplay(){
+      const print = document.getElementById('entryDatePrint');
+      if(print) print.textContent = formatJapaneseDate(getField('entryDate')?.value);
+    }
+
+    function setTodayDate(){
+      const now = new Date();
+      setValue('entryDate', `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`);
+      updateDateDisplay();
+    }
+
+    function setTodayReiwa(){ setTodayDate(); }
 
     function collectData(){
       const data = {};
       document.querySelectorAll('[data-key]').forEach(el => { data[el.dataset.key] = getValue(el); });
+      Object.assign(data, legacyDateParts(data.entryDate));
       return data;
     }
 
     function applyData(data){
-      Object.entries(data || {}).forEach(([key, value]) => setValue(key, value));
+      const normalized = {...(data || {})};
+      if(!normalized.entryDate && normalized.reYear && normalized.reMonth && normalized.reDay){
+        normalized.entryDate = isoDateFromReiwa(normalized.reYear, normalized.reMonth, normalized.reDay);
+      }
+      if(Object.prototype.hasOwnProperty.call(normalized, 'scenario_std_critical')){
+        const critical = getField('scenario_std_critical');
+        if(critical) critical.dataset.manual = 'true';
+      }
+      Object.entries(normalized).forEach(([key, value]) => setValue(key, value));
+      updateDateDisplay();
       recalcStandard();
       recalcAllComparisons();
     }
@@ -836,7 +1014,11 @@
       alert('保存しました。');
     }
     function loadData(){
-      const raw = localStorage.getItem(STORAGE_KEY);
+      let raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw){
+        const legacyKey = LEGACY_STORAGE_KEYS.find(key => localStorage.getItem(key));
+        if(legacyKey) raw = localStorage.getItem(legacyKey);
+      }
       if(!raw){ alert('保存データがありません。'); return; }
       try{
         applyData(JSON.parse(raw));
@@ -915,7 +1097,11 @@
         if(json.scenarios){
           if(json.scenarios.death != null) setValue('scenario_std_death', String(json.scenarios.death));
           if(json.scenarios.disability != null) setValue('scenario_std_disability', String(json.scenarios.disability));
-          if(json.scenarios.critical != null) setValue('scenario_std_critical', String(json.scenarios.critical));
+          if(json.scenarios.critical != null){
+            const critical = getField('scenario_std_critical');
+            if(critical) critical.dataset.manual = 'true';
+            setValue('scenario_std_critical', String(json.scenarios.critical));
+          }
         }
         recalcStandard();
         recalcAllComparisons();
@@ -939,8 +1125,10 @@
         else el.value = '';
       });
       document.querySelectorAll('.amount-input').forEach(el => { el.value = ''; el.dataset.raw = ''; });
+      const critical = getField('scenario_std_critical');
+      if(critical) delete critical.dataset.manual;
       setValue('purposeText', DEFAULT_PURPOSE);
-      setTodayReiwa();
+      setTodayDate();
       recalcStandard();
       recalcAllComparisons();
     }
@@ -965,7 +1153,7 @@
       setValue('std_total', String(total));
       setValue('scenario_std_death', String(total));
       setValue('scenario_std_disability', String(total - parseAmount(getField('std_8')?.value)));
-      if(!getField('scenario_std_critical')?.value){
+      if(getField('scenario_std_critical')?.dataset.manual !== 'true'){
         setValue('scenario_std_critical', String(total - parseAmount(getField('std_8')?.value)));
       } else {
         sanitizeAmountInput(getField('scenario_std_critical'));
@@ -992,31 +1180,50 @@
         setValue(`scenario_existing_${kind}`, String(existing));
         setValue(`scenario_gap_${kind}`, String(gap));
       });
-      document.getElementById('cardGapDeath').textContent = `${formatAmount(parseAmount(getField('scenario_gap_death')?.value))}万円`;
-      document.getElementById('cardGapDisability').textContent = `${formatAmount(parseAmount(getField('scenario_gap_disability')?.value))}万円`;
-      document.getElementById('cardGapCritical').textContent = `${formatAmount(parseAmount(getField('scenario_gap_critical')?.value))}万円`;
+      updateGapCard('cardGapDeath', parseAmount(getField('scenario_gap_death')?.value));
+      updateGapCard('cardGapDisability', parseAmount(getField('scenario_gap_disability')?.value));
+      updateGapCard('cardGapCritical', parseAmount(getField('scenario_gap_critical')?.value));
       const daidouTotal = ['death','disability','critical'].reduce((s,k)=>s + parseAmount(getField(`scenario_daidou_${k}`)?.value), 0);
       const otherTotal = ['death','disability','critical'].reduce((s,k)=>s + parseAmount(getField(`scenario_other_${k}`)?.value), 0);
       document.getElementById('cardDaidouTotal').textContent = `${formatAmount(daidouTotal)}万円`;
       document.getElementById('cardOtherTotal').textContent = `${formatAmount(otherTotal)}万円`;
     }
 
+    function updateGapCard(id, value){
+      const el = document.getElementById(id);
+      if(!el) return;
+      el.classList.remove('state-shortage','state-balanced','state-surplus');
+      if(value < 0){
+        el.textContent = `不足 ${formatAmount(Math.abs(value))}万円`;
+        el.classList.add('state-shortage');
+      }else if(value > 0){
+        el.textContent = `超過 ${formatAmount(value)}万円`;
+        el.classList.add('state-surplus');
+      }else{
+        el.textContent = '差額 0万円';
+        el.classList.add('state-balanced');
+      }
+    }
+
     function bindEvents(){
       document.querySelectorAll('.amount-input').forEach(el => {
         el.addEventListener('input', () => {
           sanitizeAmountInput(el);
-          if(el.classList.contains('std-field') || el.dataset.key === 'scenario_std_critical') recalcStandard();
+          if(el.dataset.key === 'scenario_std_critical'){
+            el.dataset.manual = 'true';
+          }else if(el.classList.contains('std-field')){
+            recalcStandard();
+          }
           recalcAllComparisons();
         });
         el.addEventListener('blur', () => sanitizeAmountInput(el));
       });
-      ['std_1','std_2','std_3','std_4','std_5','std_6','std_7','std_8','scenario_std_critical'].forEach(key => {
-        const el = getField(key);
-        if(el) el.addEventListener('input', () => { recalcStandard(); recalcAllComparisons(); });
-      });
       document.querySelectorAll('[data-key]').forEach(el => {
         if(el.classList.contains('amount-input')) return;
-        el.addEventListener('change', () => recalcAllComparisons());
+        el.addEventListener('change', () => {
+          if(el.dataset.key === 'entryDate') updateDateDisplay();
+          recalcAllComparisons();
+        });
       });
     }
 
@@ -1035,9 +1242,11 @@
 
     function normalizeOcrText(t){
       return String(t||'')
+        .normalize('NFKC')
         .replace(/\u3000/g,' ')
         .replace(/[\r\t]/g,' ')
         .replace(/\s+/g,' ')
+        .replace(/(\d)\s*,\s*(?=\d)/g,'$1,')
         .replace(/：/g,':')
         .replace(/，/g,',')
         .replace(/−/g,'-')
@@ -1109,13 +1318,13 @@
     async function buildToUnicodeMaps(objects){
       const cmapByObj = {};
       for(const [id,obj] of Object.entries(objects)){
-        if(!/begincmap/.test(obj.body)) continue;
         let raw = obj.streamBytes;
         if(!raw) continue;
         try{
           if(/\/FlateDecode/.test(obj.body)) raw = await inflateBytes(raw);
-        }catch(_){ }
+        }catch(_){ continue; }
         const txt = bytesToLatin1(raw);
+        if(!/begincmap/.test(txt)) continue;
         const map = {};
         const bfchar = /(\d+)\s+beginbfchar([\s\S]*?)endbfchar/g;
         let m;
@@ -1165,15 +1374,30 @@
       return fontMap;
     }
 
+    function combineCmaps(cmapByObj){
+      return Object.assign({}, ...Object.values(cmapByObj));
+    }
+
     function decodePdfLiteral(str){
       return str.replace(/\\([nrtbf()\\])/g, (_,c)=>({n:'\n',r:'\r',t:'\t',b:'\b',f:'\f','(':'(',')':')','\\':'\\'}[c]||c));
     }
 
     function decodeHexWithMap(hex, cmap){
       let out='';
-      for(let i=0;i+4<=hex.length;i+=4){
-        const code = hex.slice(i,i+4).toUpperCase();
-        out += (cmap && cmap[code]) ? cmap[code] : '';
+      const widths = [...new Set(Object.keys(cmap || {}).map(code => code.length))].sort((a,b)=>b-a);
+      const fallbackWidths = widths.length ? widths : [4,2];
+      for(let i=0;i<hex.length;){
+        let matched = false;
+        for(const width of fallbackWidths){
+          const code = hex.slice(i,i+width).toUpperCase();
+          if(code.length === width && cmap && cmap[code]){
+            out += cmap[code];
+            i += width;
+            matched = true;
+            break;
+          }
+        }
+        if(!matched) i += Math.min(4, hex.length - i);
       }
       return out;
     }
@@ -1182,11 +1406,10 @@
       const bytes = new Uint8Array(await file.arrayBuffer());
       const objects = await parsePdfObjects(bytes);
       const cmapByObj = await buildToUnicodeMaps(objects);
+      const fallbackCmap = combineCmaps(cmapByObj);
       let extracted = [];
       for(const obj of Object.values(objects)){
         if(!obj.streamBytes) continue;
-        const looksLikeContent = /BT/.test(obj.body) || /\/Subtype\s*\/Form/.test(obj.body);
-        if(!looksLikeContent) continue;
         let raw = obj.streamBytes;
         try{ if(/\/FlateDecode/.test(obj.body)) raw = await inflateBytes(raw); }catch(_){ continue; }
         const txt = bytesToLatin1(raw);
@@ -1197,7 +1420,7 @@
         let m;
         while((m = tokenRe.exec(txt)) !== null){
           if(m[1]){ currentFont = '/' + m[1]; continue; }
-          const cmap = fontMaps[currentFont] || {};
+          const cmap = fontMaps[currentFont] && Object.keys(fontMaps[currentFont]).length ? fontMaps[currentFont] : fallbackCmap;
           if(m[2] != null){
             const sec = m[2];
             let s='';
@@ -1224,25 +1447,144 @@
       const idx = m.index ?? -1;
       if(idx < 0) return null;
       const seg = text.slice(idx, idx + lookahead);
-      const moneyRe = /([▲-]?\s*\d{1,3}(?:,\d{3})+|[▲-]?\s*\d{2,})\s*万円/g;
-      const candidates = [];
-      let mm;
-      while((mm = moneyRe.exec(seg)) !== null){
-        const raw = mm[1];
-        const v = Number(String(raw).replace(/\s/g,'').replace(/▲/g,'-').replace(/,/g,''));
-        if(Number.isFinite(v)) candidates.push({raw, v});
+      const money = seg.match(/([▲-]?\s*\d[\d,]*)\s*万円/);
+      return money ? money[1] : null;
+    }
+
+    function extractMoneyValues(text){
+      return [...String(text || '').matchAll(/([▲-]?\s*\d[\d,]*)\s*万円/g)]
+        .map(match => cleanNumberString(match[1]))
+        .filter(value => value != null && value !== '');
+    }
+
+    function extractStandardFields(text){
+      const normalized = normalizeOcrText(text);
+      const extracted = {};
+      const clientMatch = normalized.match(/関与先名:?\s*(.+?様)(?:\s*\(|\s*担当者:|\s*役\s*職|$)/);
+      if(clientMatch) extracted.clientName = clientMatch[1].trim();
+      const staffMatch = normalized.match(/担当者:?\s*(.+?)(?=\s*関与先名|\s*役\s*職|$)/);
+      if(staffMatch) extracted.staffName = staffMatch[1].trim();
+      const dateMatch = normalized.match(/作成日:?\s*(\d{4})年\s*(\d{1,2})月\s*(\d{1,2})日/);
+      if(dateMatch) extracted.entryDate = `${dateMatch[1]}-${dateMatch[2].padStart(2,'0')}-${dateMatch[3].padStart(2,'0')}`;
+
+      const baseMap = [
+        ['std_1', /(?:1|①)\s*運転資金\s*[+＋]\s*固定費|運転資金\s*[+＋]\s*固定費/],
+        ['std_2', /(?:2|②)\s*借入金返済資金|借入金返済資金/],
+        ['std_3', /(?:3|③)\s*その他\s*の?\s*負債|その他\s*の?\s*負債/],
+        ['std_4', /(?:4|④)\s*現金化可能\s*な?\s*資産|現金化可能\s*な?\s*資産/],
+        ['std_5', /(?:5|⑤)\s*納税準備資金|納税準備資金/],
+        ['std_6', /(?:6|⑥)\s*役員退職慰労金|役員退職慰労金/],
+        ['std_7', /(?:7|⑦)\s*功労加算金|功労加算金/],
+        ['std_8', /(?:8|⑧)\s*弔慰金|弔慰金/],
+      ];
+      for(const [key, rx] of baseMap){
+        const n = cleanNumberString(findNumberNear(rx, normalized, 180));
+        if(n != null && n !== '') extracted[key] = n;
       }
-      if(candidates.length){
-        candidates.sort((a,b)=>Math.abs(b.v)-Math.abs(a.v));
-        return candidates[0].raw;
+
+      const scenarioStart = normalized.search(/[ⅠI1]\s*標準保障額\s*[\[\[]?[AＡ]\s*[+＋]\s*[BＢ]/);
+      if(scenarioStart >= 0){
+        const scenarioValues = extractMoneyValues(normalized.slice(scenarioStart, scenarioStart + 320));
+        if(scenarioValues[0] != null) extracted.scenario_std_death = scenarioValues[0];
+        if(scenarioValues[1] != null) extracted.scenario_std_disability = scenarioValues[1];
+        if(scenarioValues[2] != null) extracted.scenario_std_critical = scenarioValues[2];
       }
-      return null;
+      return extracted;
+    }
+
+    function extractedCoverageCount(extracted){
+      return ['std_1','std_2','std_3','std_4','std_5','std_6','std_7','std_8','scenario_std_death','scenario_std_disability','scenario_std_critical']
+        .filter(key => extracted[key] != null && extracted[key] !== '').length;
+    }
+
+    function standardAmountRectangles(canvas){
+      const sourceWidth = 793.76;
+      const sourceHeight = 1122.24;
+      const rect = (x, y, width, height) => ({
+        left:Math.round(canvas.width * x / sourceWidth),
+        top:Math.round(canvas.height * y / sourceHeight),
+        width:Math.round(canvas.width * width / sourceWidth),
+        height:Math.round(canvas.height * height / sourceHeight),
+      });
+      return [
+        ['std_1', rect(480,173,150,36)],
+        ['std_2', rect(480,230,150,35)],
+        ['std_3', rect(480,285,150,35)],
+        ['std_4', rect(520,340,110,35)],
+        ['std_5', rect(480,395,150,35)],
+        ['std_6', rect(480,505,150,35)],
+        ['std_7', rect(560,560,70,35)],
+        ['std_8', rect(480,615,150,35)],
+        ['scenario_std_death', rect(330,813,104,35)],
+        ['scenario_std_disability', rect(466,813,104,35)],
+        ['scenario_std_critical', rect(604,813,104,35)],
+      ];
+    }
+
+    function cleanOcrAmount(text, key){
+      const normalized = String(text || '').normalize('NFKC');
+      const digits = normalized.replace(/[^0-9-]/g,'');
+      if(!/\d/.test(digits)) return null;
+      let value = String(Number(digits));
+      if(!Number.isFinite(Number(value))) return null;
+      if(key === 'std_4' && Number(value) > 0) value = `-${value}`;
+      return value;
+    }
+
+    async function extractAmountsFromStandardPdfOCR(file){
+      setOcrStatus('PDFの金額欄を画像OCRしています…', true);
+      const pdfjs = await loadPdfJsLib();
+      const workerIndex = window.__pdfjsLoadedFromIndex || 0;
+      if(pdfjs.GlobalWorkerOptions) pdfjs.GlobalWorkerOptions.workerSrc = PDFJS_WORKER_CANDIDATES[workerIndex] || PDFJS_WORKER_CANDIDATES[0];
+      const data = new Uint8Array(await file.arrayBuffer());
+      const pdf = await pdfjs.getDocument({data}).promise;
+      const TesseractLib = await loadTesseractLib();
+      const page = await pdf.getPage(1);
+      const viewport = page.getViewport({scale:4});
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.floor(viewport.width);
+      canvas.height = Math.floor(viewport.height);
+      const ctx = canvas.getContext('2d', {willReadFrequently:true});
+      await page.render({canvasContext:ctx, viewport}).promise;
+
+      const worker = await TesseractLib.createWorker('eng', 1, {
+        logger: message => {
+          if(message?.status === 'recognizing text' && message.progress != null){
+            setOcrStatus(`金額欄を画像OCRしています… ${Math.round(message.progress * 100)}%`, true);
+          }
+        }
+      });
+      const extracted = {};
+      try{
+        await worker.setParameters({
+          tessedit_char_whitelist:'0123456789,.-',
+          tessedit_pageseg_mode:'7',
+        });
+        const rectangles = standardAmountRectangles(canvas);
+        for(let i=0;i<rectangles.length;i++){
+          const [key, rectangle] = rectangles[i];
+          setOcrStatus(`金額欄を画像OCRしています… ${i + 1}/${rectangles.length}`, true);
+          const result = await worker.recognize(canvas, {rectangle});
+          const value = cleanOcrAmount(result?.data?.text, key);
+          if(value != null) extracted[key] = value;
+        }
+      }finally{
+        await worker.terminate();
+      }
+      const allOtherAmountsRead = ['std_1','std_2','std_3','std_4','std_5','std_6','std_8','scenario_std_death','scenario_std_disability','scenario_std_critical']
+        .every(key => extracted[key] != null);
+      if(allOtherAmountsRead && extracted.std_7 == null) extracted.std_7 = '0';
+      return extracted;
     }
 
     function applyStdExtractedValues(extracted){
       const appliedKeys = [];
       for(const [k,v] of Object.entries(extracted)){
         if(v == null || v === '') continue;
+        if(k === 'scenario_std_critical'){
+          const critical = getField('scenario_std_critical');
+          if(critical) critical.dataset.manual = 'true';
+        }
         setValue(k, v);
         appliedKeys.push(k);
       }
@@ -1254,51 +1596,57 @@
     async function loadStdFromPdfOCR(file){
       if(!file) return;
       try{
-        setOcrStatus('PDF解析中…', true);
-        const text = await extractTextFromPdfOffline(file);
-        if(!text){
-          alert('PDF内のテキストを読み取れませんでした。\n\nこのオフライン版は、PDF内に文字情報が埋め込まれている帳票には対応できますが、画像だけで構成されたPDFには対応できません。');
-          setOcrStatus('', false);
-          return;
+        setOcrStatus('PDFの埋込文字を解析しています…', true);
+        const embeddedText = await extractTextFromPdfOffline(file);
+        let extracted = extractStandardFields(embeddedText);
+        if(extractedCoverageCount(extracted) < 9){
+          const ocrAmounts = await extractAmountsFromStandardPdfOCR(file);
+          extracted = {...extracted, ...ocrAmounts};
         }
-
-        const extracted = {};
-        const clientMatch = text.match(/関与先名:?\s*([^\s]+?様?)(?:\s*\(|\s*担当者:|\s*役\s*職|$)/);
-        if(clientMatch) extracted.clientName = clientMatch[1].trim();
-        const staffMatch = text.match(/担当者:?\s*([^\s]+(?:\s*[^\s]+)?)(?:\s*関与先名|\s*役\s*職|$)/);
-        if(staffMatch) extracted.staffName = staffMatch[1].trim();
-
-        const baseMap = [
-          ['std_1', /運転資金\+?固定費|運転資金＋固定費/],
-          ['std_2', /借入金返済資金/],
-          ['std_3', /その他の負債/],
-          ['std_4', /現金化可能な資産/],
-          ['std_5', /納税準備資金/],
-          ['std_6', /役員退職慰労金/],
-          ['std_7', /功労加算金/],
-          ['std_8', /弔慰金/],
-        ];
-        for(const [key, rx] of baseMap){
-          const n = cleanNumberString(findNumberNear(rx, text));
-          if(n) extracted[key] = n;
-        }
-        const death = cleanNumberString(findNumberNear(/死亡の場合/, text, 260));
-        const disab = cleanNumberString(findNumberNear(/就業障がいの場合|就業障碍の場合|就業障害の場合/, text, 300));
-        const crit = cleanNumberString(findNumberNear(/重大疾病の場合|重大疾患の場合/, text, 300));
-        if(death) extracted.scenario_std_death = death;
-        if(disab) extracted.scenario_std_disability = disab;
-        if(crit) extracted.scenario_std_critical = crit;
 
         const appliedKeys = applyStdExtractedValues(extracted);
-        if(!appliedKeys.length){
-          alert('PDFから必要な数値を抽出できませんでした。\n\nこの帳票は画像ベース出力の可能性があります。オフライン・完全自動で対応するには、PDF自体に文字情報が入っている必要があります。');
+        if(extractedCoverageCount(extracted) < 8){
+          alert('PDFから十分な金額を読み取れませんでした。\n\n画像の解像度や文字の鮮明さをご確認ください。読み取れた項目だけは画面に反映しています。');
           setOcrStatus('抽出失敗', false);
           return;
         }
-        setOcrStatus(`反映完了: ${appliedKeys.length}項目`, false);
+        setOcrStatus(`反映完了: ${appliedKeys.length}項目（必ず金額をご確認ください）`, false);
       }catch(err){
         console.error(err);
-        alert('PDF読込中にエラーが発生しました。\n\nこの版はネット接続不要ですが、画像だけのPDFには対応できません。');
-        setOcrStatus('', false);
+        alert('PDF読込中にエラーが発生しました。\n\n画像OCRには初回のみネット接続が必要です。接続状況を確認して、もう一度お試しください。');
+        setOcrStatus('PDF読込エラー', false);
       }
     }
+
+    function wirePdfInput(){
+      const input = document.getElementById('stdPdfInput');
+      if(!input) return;
+      input.addEventListener('change', async () => {
+        const file = input.files && input.files[0];
+        if(!file) return;
+        await loadStdFromPdfOCR(file);
+        input.value = '';
+      });
+    }
+
+    function init(){
+      populateSelectors();
+      const fieldLabels = {
+        std_1:'①運転資金＋固定費 金額',std_2:'②借入金返済資金 金額',std_3:'③その他の負債 金額',
+        std_4:'④現金化可能な資産 金額',std_5:'⑤納税準備資金 金額',std_6:'⑥役員退職慰労金 金額',
+        std_7:'⑦功労加算金 金額',std_8:'⑧弔慰金 金額',std_A:'A 企業防衛準備資金 小計',
+        std_B:'B 役員退職慰労金準備資金 小計',std_total:'標準保障額 合計',scenario_std_critical:'重大疾病の場合 標準保障額'
+      };
+      Object.entries(fieldLabels).forEach(([key,label]) => getField(key)?.setAttribute('aria-label', label));
+      bindEvents();
+      wirePdfInput();
+      setTodayDate();
+      setValue('purposeText', DEFAULT_PURPOSE);
+      recalcStandard();
+      recalcAllComparisons();
+    }
+
+    init();
+  </script>
+</body>
+</html>

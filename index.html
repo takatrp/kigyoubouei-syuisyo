@@ -83,6 +83,10 @@
     .menu-section-note{font-size:11px;color:var(--muted);margin:0 0 8px;line-height:1.45;}
     .menu-items{display:flex;gap:7px;flex-wrap:wrap;}
     .menu-items button{flex:1 1 190px;justify-content:center;}
+    .import-choices{display:grid;gap:8px;}
+    .import-choice{display:grid;grid-template-columns:minmax(185px,.9fr) 1.1fr;align-items:center;gap:9px;padding:8px;border:1px solid #d8e2ec;border-radius:8px;background:#fff;}
+    .import-choice label.file-btn{justify-content:center;font-weight:800;text-align:center;}
+    .import-choice span{font-size:11px;line-height:1.45;color:#526173;}
     .export-choices{display:grid;gap:8px;}
     .export-choice{display:grid;grid-template-columns:minmax(165px,.8fr) 1.2fr;align-items:center;gap:9px;padding:8px;border:1px solid #d8e2ec;border-radius:8px;background:#fff;}
     .export-choice button{justify-content:center;font-weight:800;}
@@ -233,6 +237,7 @@
       .toolbar label.file-btn.pdf-primary{padding:7px 10px;}
       .more-panel{position:fixed;left:8px;right:8px;top:122px;width:auto;grid-template-columns:1fr;max-height:calc(100vh - 138px);overflow-y:auto;}
       .menu-section.wide{grid-column:auto;}
+      .import-choice{grid-template-columns:1fr;}
       .export-choice{grid-template-columns:1fr;}
       .page{width:calc(100vw - 16px);margin-top:12px;}
       .doc-heading{padding:22px 14px;border-radius:12px;}
@@ -294,32 +299,32 @@
         </label>
         <span id="ocrStatus" class="status hidden" role="status">OCR待機</span>
         <details class="more-actions">
-          <summary>JSON入出力・補助</summary>
+          <summary>データ保存・復元</summary>
           <div class="more-panel">
             <div class="menu-section">
-              <div class="menu-section-title">JSONを取り込む</div>
-              <p class="menu-section-note">標準保障額のJSONを貼り付けて入力欄へ反映します。</p>
-              <div class="menu-items">
-                <button type="button" onclick="importStdJsonPrompt()">標準保障額JSONを貼り付けて取込</button>
+              <div class="menu-section-title">提案書全体を復元する</div>
+              <p class="menu-section-note">以前に保存した提案書全体のJSONファイルを選択します。</p>
+              <div class="import-choices">
+                <div class="import-choice">
+                  <label class="file-btn" for="allJsonInput">提案書全体JSONを読込</label>
+                  <input id="allJsonInput" type="file" accept=".json,application/json" />
+                  <span>顧客情報、標準保障額、大同生命・他社の保険明細などをすべて復元します。</span>
+                </div>
               </div>
             </div>
             <div class="menu-section">
-              <div class="menu-section-title">JSONを書き出す</div>
-              <p class="menu-section-note">保存する情報の範囲を選びます。</p>
+              <div class="menu-section-title">提案書全体を保存する</div>
+              <p class="menu-section-note">現在の入力内容を、あとで復元できるJSONファイルとして保存します。</p>
               <div class="export-choices">
                 <div class="export-choice">
-                  <button type="button" onclick="downloadStdJson()">標準保障額だけを出力</button>
-                  <span>①〜⑧、小計、標準保障額と3つのシナリオだけを保存します。顧客情報や保険明細は含みません。</span>
-                </div>
-                <div class="export-choice">
-                  <button type="button" onclick="downloadAllJson()">提案書全体を出力</button>
+                  <button type="button" onclick="downloadAllJson()">提案書全体JSONを保存</button>
                   <span>顧客情報、標準保障額、大同生命・他社の保険明細など、現在の入力内容をすべて保存します。</span>
                 </div>
               </div>
             </div>
             <div class="menu-section wide">
               <div class="menu-section-title">記載補助・初期化</div>
-              <p class="menu-section-note">サンプルを呼び出すか、すべての入力内容を消去します。</p>
+              <p class="menu-section-note">標準保障額は算定書PDFから読み込みます。ここではサンプル表示や初期化ができます。</p>
               <div class="menu-items">
                 <button type="button" onclick="loadExampleForm()">記載例を読込</button>
                 <button class="warn" type="button" onclick="loadStdSampleValues()">標準保障額サンプルを読込</button>
@@ -1104,84 +1109,57 @@
       downloadBlob(blob, 'enterprise_defense_form.json');
     }
 
-    function stdPayload(){
-      const payload = {
-        meta:{
-          clientName: getField('clientName')?.value || '',
-          staffName: getField('staffName')?.value || ''
-        },
-        base:{
-          '1': parseAmount(getField('std_1')?.value),
-          '2': parseAmount(getField('std_2')?.value),
-          '3': parseAmount(getField('std_3')?.value),
-          '4': parseAmount(getField('std_4')?.value),
-          '5': parseAmount(getField('std_5')?.value),
-          A: parseAmount(getField('std_A')?.value),
-          '6': parseAmount(getField('std_6')?.value),
-          '7': parseAmount(getField('std_7')?.value),
-          '8': parseAmount(getField('std_8')?.value),
-          B: parseAmount(getField('std_B')?.value),
-          total: parseAmount(getField('std_total')?.value)
-        },
-        scenarios:{
-          death: parseAmount(getField('scenario_std_death')?.value),
-          disability: parseAmount(getField('scenario_std_disability')?.value),
-          critical: parseAmount(getField('scenario_std_critical')?.value)
-        },
-        notes:{
-          '1': getField('std_1_note')?.value || '',
-          '2': getField('std_2_note')?.value || '',
-          '3': getField('std_3_note')?.value || '',
-          '4': getField('std_4_note')?.value || '',
-          '5': getField('std_5_note')?.value || '',
-          '6': getField('std_6_note')?.value || '',
-          '7': getField('std_7_note')?.value || '',
-          '8': getField('std_8_note')?.value || ''
-        }
-      };
-      return payload;
+    function isPlainJsonObject(value){
+      return value != null && typeof value === 'object' && !Array.isArray(value);
     }
 
-    function downloadStdJson(){
-      const blob = new Blob([JSON.stringify(stdPayload(), null, 2)], {type:'application/json'});
-      downloadBlob(blob, 'standard_hosho_data.json');
-    }
-
-    function importStdJsonPrompt(){
-      const sample = JSON.stringify(stdPayload(), null, 2);
-      const input = prompt('標準保障額連携用JSONを貼り付けてください。\n\n想定形式の例：\n' + sample.slice(0, 500) + (sample.length > 500 ? '\n...' : ''));
-      if(!input) return;
+    async function parseJsonFile(file){
+      if(!file) throw new Error('JSONファイルが選択されていません。');
+      if(!file.name.toLowerCase().endsWith('.json')) throw new Error('拡張子が.jsonのファイルを選択してください。');
+      if(file.size > 1024 * 1024) throw new Error('JSONファイルは1MB以下のものを選択してください。');
+      const text = (await file.text()).replace(/^\uFEFF/, '').trim();
+      if(!text) throw new Error('JSONファイルが空です。');
       try{
-        const json = JSON.parse(input);
-        if(json.meta){
-          if(json.meta.clientName != null) setValue('clientName', json.meta.clientName);
-          if(json.meta.staffName != null) setValue('staffName', json.meta.staffName);
+        const json = JSON.parse(text);
+        if(!isPlainJsonObject(json)) throw new Error();
+        return json;
+      }catch(_){
+        throw new Error('JSONファイルの内容を読み取れません。正しいJSONファイルか確認してください。');
+      }
+    }
+
+    function resetDataFields(){
+      document.querySelectorAll('[data-key]').forEach(el => {
+        if(el.type === 'checkbox') el.checked = false;
+        else el.value = '';
+      });
+      document.querySelectorAll('.amount-input').forEach(el => { el.value = ''; el.dataset.raw = ''; });
+      const critical = getField('scenario_std_critical');
+      if(critical) delete critical.dataset.manual;
+    }
+
+    function applyAllJson(json){
+      const validKeys = new Set([...document.querySelectorAll('[data-key]')].map(el => el.dataset.key));
+      const entries = Object.entries(json).filter(([key]) => validKeys.has(key));
+      if(entries.length < 5) throw new Error('提案書全体JSONとして認識できる項目が不足しています。');
+      entries.forEach(([key,value]) => {
+        if(value != null && !['string','number','boolean'].includes(typeof value)){
+          throw new Error(`${key}の形式が正しくありません。`);
         }
-        if(json.base){
-          ['1','2','3','4','5','6','7','8','A','B','total'].forEach(k => {
-            if(json.base[k] != null){
-              const targetKey = ({A:'std_A',B:'std_B',total:'std_total'})[k] || `std_${k}`;
-              setValue(targetKey, String(json.base[k]));
-            }
-          });
-        }
-        if(json.notes){
-          ['1','2','3','4','5','6','7','8'].forEach(k => { if(json.notes[k] != null) setValue(`std_${k}_note`, json.notes[k]); });
-        }
-        if(json.scenarios){
-          if(json.scenarios.death != null) setValue('scenario_std_death', String(json.scenarios.death));
-          if(json.scenarios.disability != null) setValue('scenario_std_disability', String(json.scenarios.disability));
-          if(json.scenarios.critical != null){
-            const critical = getField('scenario_std_critical');
-            if(critical) critical.dataset.manual = 'true';
-            setValue('scenario_std_critical', String(json.scenarios.critical));
-          }
-        }
-        recalcStandard();
-        recalcAllComparisons();
-        alert('標準保障額JSONを反映しました。');
-      } catch(e){
-        alert('JSONの読込に失敗しました。形式を確認してください。');
+      });
+      resetDataFields();
+      applyData(json);
+      return entries.length;
+    }
+
+    async function loadAllJsonFile(file){
+      try{
+        const json = await parseJsonFile(file);
+        if(!confirm(`「${file.name}」から提案書全体を読み込みます。\n現在の入力内容はすべて置き換わります。よろしいですか？`)) return;
+        const count = applyAllJson(json);
+        alert(`提案書全体JSONを読み込みました。（${count}項目）`);
+      }catch(error){
+        alert(error?.message || '提案書全体JSONの読込に失敗しました。');
       }
     }
 
@@ -1194,13 +1172,7 @@
 
     function clearForm(){
       if(!confirm('入力内容を初期化します。よろしいですか？')) return;
-      document.querySelectorAll('[data-key]').forEach(el => {
-        if(el.type === 'checkbox') el.checked = false;
-        else el.value = '';
-      });
-      document.querySelectorAll('.amount-input').forEach(el => { el.value = ''; el.dataset.raw = ''; });
-      const critical = getField('scenario_std_critical');
-      if(critical) delete critical.dataset.manual;
+      resetDataFields();
       setValue('purposeText', DEFAULT_PURPOSE);
       setTodayDate();
       recalcStandard();
@@ -1703,6 +1675,17 @@
       });
     }
 
+    function wireJsonInput(){
+      const input = document.getElementById('allJsonInput');
+      if(!input) return;
+      input.addEventListener('change', async () => {
+        const file = input.files && input.files[0];
+        if(!file) return;
+        await loadAllJsonFile(file);
+        input.value = '';
+      });
+    }
+
     function init(){
       populateSelectors();
       const fieldLabels = {
@@ -1714,6 +1697,7 @@
       Object.entries(fieldLabels).forEach(([key,label]) => getField(key)?.setAttribute('aria-label', label));
       bindEvents();
       wirePdfInput();
+      wireJsonInput();
       setTodayDate();
       setValue('purposeText', DEFAULT_PURPOSE);
       recalcStandard();

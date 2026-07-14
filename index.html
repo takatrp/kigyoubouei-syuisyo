@@ -55,6 +55,17 @@
     .toolbar button.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:800;}
     .toolbar button.primary:hover{background:var(--accent-deep);}
     .toolbar button.warn{border-color:#dfbf72;background:#fffaf0;}
+    .toolbar label.file-btn.pdf-primary{
+      border:2px solid #bd8210;background:linear-gradient(135deg,#fff3bd,#ffd968);color:#543900;
+      padding:8px 14px;font-weight:900;box-shadow:0 4px 12px rgba(166,113,10,.2);
+    }
+    .toolbar label.file-btn.pdf-primary:hover{border-color:#936308;background:#ffedaa;transform:translateY(-1px);}
+    .pdf-primary::before{
+      content:"PDF";display:inline-flex;align-items:center;justify-content:center;min-width:31px;height:24px;
+      padding:0 5px;border-radius:5px;background:#8f2f24;color:#fff;font-size:10px;font-weight:900;letter-spacing:.04em;
+    }
+    .pdf-primary-copy{display:flex;flex-direction:column;gap:1px;}
+    .pdf-primary-copy small{font-size:10px;font-weight:700;color:#765414;}
     .toolbar input[type="file"]{display:none;}
     .more-actions{position:relative;}
     .more-actions summary{list-style:none;font-weight:700;color:var(--accent-deep);}
@@ -62,17 +73,27 @@
     .more-actions summary::after{content:"▼";font-size:9px;margin-left:3px;color:#64748b;}
     .more-actions[open] summary::after{content:"▲";}
     .more-panel{
-      position:absolute;right:0;top:calc(100% + 8px);width:min(620px, calc(100vw - 28px));padding:12px;
-      display:flex;flex-wrap:wrap;gap:8px;background:#fff;border:1px solid #d5dfeb;border-radius:12px;
+      position:absolute;right:0;top:calc(100% + 8px);width:min(680px, calc(100vw - 28px));padding:14px;
+      display:grid;grid-template-columns:1fr 1fr;gap:12px;background:#fff;border:1px solid #d5dfeb;border-radius:12px;
       box-shadow:0 16px 40px rgba(15,42,68,.18);
     }
+    .menu-section{border:1px solid #dce5ee;border-radius:10px;padding:11px;background:#f9fbfd;}
+    .menu-section.wide{grid-column:1 / -1;}
+    .menu-section-title{font-size:13px;font-weight:900;color:var(--accent-deep);margin-bottom:2px;}
+    .menu-section-note{font-size:11px;color:var(--muted);margin:0 0 8px;line-height:1.45;}
+    .menu-items{display:flex;gap:7px;flex-wrap:wrap;}
+    .menu-items button{flex:1 1 190px;justify-content:center;}
+    .export-choices{display:grid;gap:8px;}
+    .export-choice{display:grid;grid-template-columns:minmax(165px,.8fr) 1.2fr;align-items:center;gap:9px;padding:8px;border:1px solid #d8e2ec;border-radius:8px;background:#fff;}
+    .export-choice button{justify-content:center;font-weight:800;}
+    .export-choice span{font-size:11px;line-height:1.45;color:#526173;}
     .status{
       display:inline-flex; align-items:center; gap:8px;
       padding:8px 10px; border:1px solid #dbe2ea; background:#f8fafc;
       border-radius:10px; font-size:12px; color:#374151;
     }
     .status.hidden{display:none;}
-    .page{width:min(1280px, calc(100vw - 32px));margin:22px auto 48px;}
+    .page{width:min(1480px, calc(100vw - 20px));margin:22px auto 48px;}
     .workflow-nav{
       display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;margin:0 0 14px;
     }
@@ -91,7 +112,7 @@
     h1{position:relative;z-index:1;margin:0;text-align:center;font-size:32px;letter-spacing:.08em;}
     .doc-heading .lead{position:relative;z-index:1;margin:7px 0 0;font-size:14px;color:#e7f2fa;}
     .section-panel,.summary-section{
-      background:var(--paper);border:1px solid #dbe3ec;border-radius:16px;padding:22px;
+      background:var(--paper);border:1px solid #dbe3ec;border-radius:16px;padding:18px;
       box-shadow:0 8px 24px rgba(15,42,68,.06);
     }
     .section-kicker{font-size:11px;font-weight:900;letter-spacing:.12em;color:var(--accent);margin-bottom:2px;}
@@ -119,7 +140,7 @@
     }
     .top-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:18px;align-items:stretch;margin-top:18px;}
     .people-tables{min-width:0;}
-    .table-scroll{max-width:100%;overflow-x:auto;padding-bottom:2px;scrollbar-color:#8ea6bc #eef3f8;}
+    .table-scroll{max-width:100%;overflow-x:visible;padding-bottom:2px;scrollbar-color:#8ea6bc #eef3f8;}
     .people-table-wrap{max-width:100%;overflow-x:auto;}
     table{border-collapse:collapse;width:100%;table-layout:fixed;}
     th,td{border:1px solid var(--border);padding:7px 8px;vertical-align:middle;}
@@ -141,6 +162,13 @@
     .section{margin-top:18px;scroll-margin-top:92px;}
     .section-title{font-size:22px;color:var(--accent-deep);font-weight:850;margin:0 0 13px;display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;}
     .subtext{font-size:13px;color:var(--muted);font-weight:600;}
+    .section-title-actions{display:flex;align-items:center;justify-content:flex-end;gap:10px;flex-wrap:wrap;}
+    .section-pdf-btn{
+      display:inline-flex;align-items:center;gap:7px;border:2px solid #bd8210;border-radius:9px;background:#fff2b8;
+      color:#5c3d00;padding:8px 12px;font-size:12px;font-weight:900;cursor:pointer;white-space:nowrap;
+    }
+    .section-pdf-btn:hover{background:#ffe58b;border-color:#936308;}
+    .section-pdf-btn::before{content:"PDF";background:#8f2f24;color:#fff;border-radius:4px;padding:3px 5px;font-size:9px;}
     .grid-2{display:grid;grid-template-columns:1.15fr .85fr;gap:16px;}
     .hint-box{border:1px solid #d8e2ec;background:var(--soft);padding:11px 13px;border-radius:10px;font-size:13px;line-height:1.65;color:#42526a;margin-top:10px;}
     .std-table .item{font-weight:700;}
@@ -178,9 +206,16 @@
     .tiny{font-size:12px;line-height:1.35;}
     .note-list{margin-top:8px;font-size:12px;color:#4b5563;line-height:1.65;}
     .json-area{display:none;}
-    .insurer-table{min-width:1040px;}
-    .insurer-table td > input{width:100%;min-width:0;border:none;background:transparent;padding:5px;}
-    .insurer-table .type-input{min-width:68px;text-align:center;background:#fff;}
+    .insurer-table{min-width:0;font-size:clamp(9px,.78vw,12px);line-height:1.3;}
+    .insurer-table th,.insurer-table td{padding:4px 3px;overflow-wrap:anywhere;word-break:normal;}
+    .insurer-table td{height:36px;min-height:36px;}
+    .insurer-table td > input{width:100%;max-width:100%!important;min-width:0;border:none;background:transparent;padding:3px 2px;font-size:inherit;}
+    .insurer-table .type-input{min-width:0;text-align:center;background:#fff;}
+    .insurer-table .amount-wrap{gap:1px;min-height:24px;}
+    .insurer-table .amount-wrap input{padding:3px 1px;font-size:inherit;}
+    .insurer-table .amount-unit{display:none;}
+    .insurer-table .small,.insurer-table .tiny{font-size:inherit;line-height:1.3;}
+    .table-unit{display:block;margin-top:2px;font-size:.82em;font-weight:700;color:#607086;}
     .std-table{min-width:640px;}
     .scenario-table{min-width:610px;}
     .footer-note{margin-top:18px;font-size:13px;color:#4b5563;line-height:1.7;border:1px solid #d8e2ec;background:#fafcff;padding:12px 14px;border-radius:10px;}
@@ -195,6 +230,10 @@
       .toolbar-inner{width:calc(100vw - 20px);flex-direction:column;gap:8px;}
       .toolbar-actions{width:100%;justify-content:flex-start;}
       .toolbar button,.more-actions summary{padding:8px 10px;}
+      .toolbar label.file-btn.pdf-primary{padding:7px 10px;}
+      .more-panel{position:fixed;left:8px;right:8px;top:122px;width:auto;grid-template-columns:1fr;max-height:calc(100vh - 138px);overflow-y:auto;}
+      .menu-section.wide{grid-column:auto;}
+      .export-choice{grid-template-columns:1fr;}
       .page{width:calc(100vw - 16px);margin-top:12px;}
       .doc-heading{padding:22px 14px;border-radius:12px;}
       h1{font-size:25px;}
@@ -203,8 +242,15 @@
       .line-field .label{font-size:18px;}
       .purpose-title{font-size:20px;}
       .cards{grid-template-columns:1fr;}
-      .workflow-nav{justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap;padding-bottom:4px;}
-      .workflow-nav a{white-space:nowrap;}
+      .workflow-nav{justify-content:flex-start;overflow:visible;flex-wrap:wrap;padding-bottom:4px;}
+      .people-table-wrap,.table-scroll{overflow-x:visible;}
+      .mini,.std-table,.scenario-table{min-width:0;}
+      .mini{font-size:10px;}
+      .mini th,.mini td{font-size:10px;padding:4px 3px;}
+      .std-table,.scenario-table{font-size:9px;}
+      .std-table th,.std-table td,.scenario-table th,.scenario-table td{padding:4px 3px;}
+      .insurer-table{font-size:8px;}
+      .insurer-table th,.insurer-table td{padding:3px 1px;}
     }
     @media print{
       @page{size:A4 landscape;margin:8mm;}
@@ -242,19 +288,44 @@
         <button class="primary" type="button" onclick="saveData()">保存</button>
         <button type="button" onclick="loadData()">読込</button>
         <button type="button" onclick="window.print()">印刷</button>
+        <label class="file-btn pdf-primary" title="標準保障額算定書のPDFから金額を自動入力">
+          <span class="pdf-primary-copy"><span>標準保障額PDF読込</span><small>算定書から自動入力</small></span>
+          <input id="stdPdfInput" type="file" accept="application/pdf" />
+        </label>
+        <span id="ocrStatus" class="status hidden" role="status">OCR待機</span>
         <details class="more-actions">
-          <summary>データ連携・その他</summary>
+          <summary>JSON入出力・補助</summary>
           <div class="more-panel">
-            <button type="button" onclick="loadExampleForm()">記載例読込</button>
-            <button class="warn" type="button" onclick="loadStdSampleValues()">標準保障額サンプル読込</button>
-            <label class="file-btn warn" title="埋込文字を優先し、必要に応じて画像OCRを実行">標準保障額PDF読込
-              <input id="stdPdfInput" type="file" accept="application/pdf" />
-            </label>
-            <span id="ocrStatus" class="status hidden" role="status">OCR待機</span>
-            <button type="button" onclick="importStdJsonPrompt()">標準保障額JSON取込</button>
-            <button type="button" onclick="downloadStdJson()">標準保障額JSON出力</button>
-            <button type="button" onclick="downloadAllJson()">全体JSON出力</button>
-            <button type="button" onclick="clearForm()">初期化</button>
+            <div class="menu-section">
+              <div class="menu-section-title">JSONを取り込む</div>
+              <p class="menu-section-note">標準保障額のJSONを貼り付けて入力欄へ反映します。</p>
+              <div class="menu-items">
+                <button type="button" onclick="importStdJsonPrompt()">標準保障額JSONを貼り付けて取込</button>
+              </div>
+            </div>
+            <div class="menu-section">
+              <div class="menu-section-title">JSONを書き出す</div>
+              <p class="menu-section-note">保存する情報の範囲を選びます。</p>
+              <div class="export-choices">
+                <div class="export-choice">
+                  <button type="button" onclick="downloadStdJson()">標準保障額だけを出力</button>
+                  <span>①〜⑧、小計、標準保障額と3つのシナリオだけを保存します。顧客情報や保険明細は含みません。</span>
+                </div>
+                <div class="export-choice">
+                  <button type="button" onclick="downloadAllJson()">提案書全体を出力</button>
+                  <span>顧客情報、標準保障額、大同生命・他社の保険明細など、現在の入力内容をすべて保存します。</span>
+                </div>
+              </div>
+            </div>
+            <div class="menu-section wide">
+              <div class="menu-section-title">記載補助・初期化</div>
+              <p class="menu-section-note">サンプルを呼び出すか、すべての入力内容を消去します。</p>
+              <div class="menu-items">
+                <button type="button" onclick="loadExampleForm()">記載例を読込</button>
+                <button class="warn" type="button" onclick="loadStdSampleValues()">標準保障額サンプルを読込</button>
+                <button type="button" onclick="clearForm()">入力内容を初期化</button>
+              </div>
+            </div>
           </div>
         </details>
       </div>
@@ -387,7 +458,10 @@
     <section class="section section-panel" id="standard">
       <div class="section-title">
         <span>標準保障額</span>
-        <span class="subtext">添付の標準保障額算定書との連携を見据えた入力欄です。</span>
+        <span class="section-title-actions">
+          <span class="subtext">標準保障額算定書との連携を見据えた入力欄です。</span>
+          <label class="section-pdf-btn" for="stdPdfInput">算定書PDFから自動入力</label>
+        </span>
       </div>
       <div class="grid-2">
         <div class="table-scroll">
@@ -526,9 +600,9 @@
           <th rowspan="2">事由</th>
           <th rowspan="2"></th>
           <th rowspan="2">タイプ</th>
-          <th rowspan="2">保険金額</th>
-          <th rowspan="2">解約返戻金</th>
-          <th colspan="5">保険金額使途</th>
+          <th rowspan="2">保険金額<span class="table-unit">（万円）</span></th>
+          <th rowspan="2">解約返戻金<span class="table-unit">（万円）</span></th>
+          <th colspan="5">保険金額使途<span class="table-unit">（万円）</span></th>
           <th rowspan="2">備考</th>
         </tr>
         <tr>
@@ -650,9 +724,9 @@
           <th rowspan="2">事由</th>
           <th rowspan="2"></th>
           <th rowspan="2">タイプ</th>
-          <th rowspan="2">保険金額</th>
-          <th rowspan="2">解約返戻金</th>
-          <th colspan="5">保険金額使途</th>
+          <th rowspan="2">保険金額<span class="table-unit">（万円）</span></th>
+          <th rowspan="2">解約返戻金<span class="table-unit">（万円）</span></th>
+          <th colspan="5">保険金額使途<span class="table-unit">（万円）</span></th>
           <th rowspan="2">備考</th>
         </tr>
         <tr>

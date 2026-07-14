@@ -73,24 +73,31 @@
     .more-actions summary::after{content:"▼";font-size:9px;margin-left:3px;color:#64748b;}
     .more-actions[open] summary::after{content:"▲";}
     .more-panel{
-      position:absolute;right:0;top:calc(100% + 8px);width:min(680px, calc(100vw - 28px));padding:14px;
-      display:grid;grid-template-columns:1fr 1fr;gap:12px;background:#fff;border:1px solid #d5dfeb;border-radius:12px;
-      box-shadow:0 16px 40px rgba(15,42,68,.18);
+      position:absolute;right:0;top:calc(100% + 8px);z-index:80;width:min(1000px, calc(100vw - 24px));
+      max-height:calc(100vh - 84px);overflow-y:auto;overscroll-behavior:contain;padding:18px;
+      display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;background:#fff;border:1px solid #d5dfeb;border-radius:14px;
+      box-shadow:0 20px 54px rgba(15,42,68,.22);
     }
-    .menu-section{border:1px solid #dce5ee;border-radius:10px;padding:11px;background:#f9fbfd;}
+    .menu-section{min-width:0;border:1px solid #dce5ee;border-radius:12px;padding:14px;background:#f9fbfd;}
     .menu-section.wide{grid-column:1 / -1;}
-    .menu-section-title{font-size:13px;font-weight:900;color:var(--accent-deep);margin-bottom:2px;}
-    .menu-section-note{font-size:11px;color:var(--muted);margin:0 0 8px;line-height:1.45;}
+    .menu-section-title{font-size:15px;font-weight:900;color:var(--accent-deep);margin-bottom:3px;}
+    .menu-section-note{font-size:12px;color:var(--muted);margin:0 0 11px;line-height:1.55;}
     .menu-items{display:flex;gap:7px;flex-wrap:wrap;}
     .menu-items button{flex:1 1 190px;justify-content:center;}
-    .import-choices{display:grid;gap:8px;}
-    .import-choice{display:grid;grid-template-columns:minmax(185px,.9fr) 1.1fr;align-items:center;gap:9px;padding:8px;border:1px solid #d8e2ec;border-radius:8px;background:#fff;}
-    .import-choice label.file-btn{justify-content:center;font-weight:800;text-align:center;}
-    .import-choice span{font-size:11px;line-height:1.45;color:#526173;}
+    .json-drop-zone{
+      min-height:160px;border:2px dashed #8ca7bf;border-radius:12px;background:#fff;display:grid;
+      grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:14px;padding:18px;transition:.18s border-color,.18s background,.18s box-shadow;
+    }
+    .json-drop-zone.is-dragover{border-color:var(--accent);background:var(--accent-soft);box-shadow:0 0 0 4px rgba(15,76,129,.1);}
+    .drop-file-mark{display:inline-flex;align-items:center;justify-content:center;width:54px;height:54px;border-radius:12px;background:var(--accent-deep);color:#fff;font-size:12px;font-weight:900;letter-spacing:.05em;}
+    .drop-copy{min-width:0;display:flex;flex-direction:column;gap:3px;}
+    .drop-copy strong{font-size:14px;color:#183b58;}
+    .drop-copy span{font-size:11px;line-height:1.5;color:#607086;}
+    .json-drop-zone label.file-btn{justify-content:center;font-weight:850;text-align:center;white-space:normal;}
     .export-choices{display:grid;gap:8px;}
-    .export-choice{display:grid;grid-template-columns:minmax(165px,.8fr) 1.2fr;align-items:center;gap:9px;padding:8px;border:1px solid #d8e2ec;border-radius:8px;background:#fff;}
+    .export-choice{min-width:0;min-height:160px;display:grid;grid-template-columns:minmax(180px,.8fr) 1.2fr;align-items:center;gap:14px;padding:18px;border:1px solid #d8e2ec;border-radius:12px;background:#fff;}
     .export-choice button{justify-content:center;font-weight:800;}
-    .export-choice span{font-size:11px;line-height:1.45;color:#526173;}
+    .export-choice span{font-size:12px;line-height:1.55;color:#526173;}
     .status{
       display:inline-flex; align-items:center; gap:8px;
       padding:8px 10px; border:1px solid #dbe2ea; background:#f8fafc;
@@ -160,9 +167,15 @@
     .check-cell{text-align:center;}
     .check-cell input{transform:scale(1.1);}
     .purpose-box{border:1px solid #e8cf8b;border-left:6px solid var(--gold);border-radius:12px;overflow:hidden;background:var(--gold-soft);}
-    .purpose-title{padding:10px 14px;text-align:left;font-size:19px;color:#57400b;font-weight:850;border-bottom:1px solid #eedca8;}
+    .purpose-title{padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:19px;color:#57400b;font-weight:850;border-bottom:1px solid #eedca8;}
+    .purpose-title-actions{display:flex;align-items:center;gap:8px;}
+    .purpose-edit-hint{font-size:11px;color:#7a5d18;font-weight:700;}
+    .purpose-edit-btn{border:1px solid #b78a21;border-radius:8px;background:#fff;color:#6b4a00;padding:6px 11px;font-size:12px;font-weight:900;cursor:pointer;}
+    .purpose-edit-btn:hover{background:#fff7d8;}
     .purpose-body{padding:12px 14px;min-height:200px;}
-    .purpose-body textarea{width:100%;min-height:168px;border:none;background:transparent;line-height:1.85;resize:vertical;}
+    .purpose-body textarea{width:100%;min-height:168px;border:1px solid transparent;border-radius:8px;background:transparent;line-height:1.85;resize:none;padding:8px;transition:.18s border-color,.18s background,.18s box-shadow;}
+    .purpose-body textarea[readonly]{cursor:default;}
+    .purpose-box.is-editing .purpose-body textarea{border-color:#c69a2c;background:#fff;box-shadow:0 0 0 3px rgba(201,145,24,.12);resize:vertical;}
     .section{margin-top:18px;scroll-margin-top:92px;}
     .section-title{font-size:22px;color:var(--accent-deep);font-weight:850;margin:0 0 13px;display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;}
     .subtext{font-size:13px;color:var(--muted);font-weight:600;}
@@ -230,22 +243,28 @@
       .cards{grid-template-columns:repeat(3,1fr);}
       .date-row,.person-row{justify-content:flex-start;}
     }
+    @media (max-width: 900px){
+      .more-panel{grid-template-columns:1fr;width:min(760px, calc(100vw - 20px));}
+      .menu-section.wide{grid-column:auto;}
+    }
     @media (max-width: 700px){
       .toolbar-inner{width:calc(100vw - 20px);flex-direction:column;gap:8px;}
       .toolbar-actions{width:100%;justify-content:flex-start;}
       .toolbar button,.more-actions summary{padding:8px 10px;}
       .toolbar label.file-btn.pdf-primary{padding:7px 10px;}
-      .more-panel{position:fixed;left:8px;right:8px;top:122px;width:auto;grid-template-columns:1fr;max-height:calc(100vh - 138px);overflow-y:auto;}
+      .more-panel{position:fixed;left:8px;right:8px;top:122px;width:auto;grid-template-columns:1fr;max-height:calc(100vh - 138px);overflow-y:auto;padding:12px;}
       .menu-section.wide{grid-column:auto;}
-      .import-choice{grid-template-columns:1fr;}
-      .export-choice{grid-template-columns:1fr;}
+      .json-drop-zone{min-height:0;grid-template-columns:auto 1fr;padding:12px;}
+      .json-drop-zone label.file-btn{grid-column:1 / -1;}
+      .export-choice{grid-template-columns:1fr;min-height:0;padding:12px;}
       .page{width:calc(100vw - 16px);margin-top:12px;}
       .doc-heading{padding:22px 14px;border-radius:12px;}
       h1{font-size:25px;}
       .doc-heading .lead{font-size:12px;}
       .section-panel,.summary-section{padding:15px;border-radius:12px;}
       .line-field .label{font-size:18px;}
-      .purpose-title{font-size:20px;}
+      .purpose-title{font-size:20px;align-items:flex-start;flex-direction:column;}
+      .purpose-title-actions{width:100%;justify-content:space-between;}
       .cards{grid-template-columns:1fr;}
       .workflow-nav{justify-content:flex-start;overflow:visible;flex-wrap:wrap;padding-bottom:4px;}
       .people-table-wrap,.table-scroll{overflow-x:visible;}
@@ -258,27 +277,89 @@
       .insurer-table th,.insurer-table td{padding:3px 1px;}
     }
     @media print{
-      @page{size:A4 landscape;margin:8mm;}
-      body{background:#fff;}
-      .toolbar,.workflow-nav,.controls,.footer-note,.today-btn{display:none !important;}
+      @page{size:A4 landscape;margin:6mm;}
+      html,body{
+        width:285mm;
+        margin:0;
+        background:#fff;
+        color:#111;
+        font-size:7.2pt;
+        line-height:1.18;
+        -webkit-print-color-adjust:exact;
+        print-color-adjust:exact;
+      }
+      .toolbar,.workflow-nav,.controls,.footer-note,.today-btn,.purpose-edit-btn,.purpose-edit-hint,.section-pdf-btn{display:none !important;}
       .page{width:100%;margin:0;box-shadow:none;padding:0;}
-      .doc-heading{background:#fff;color:#111;box-shadow:none;border-radius:0;padding:0 0 7mm;}
-      .doc-heading .eyebrow,.doc-heading .lead{color:#333;}
-      .section-panel,.summary-section{box-shadow:none;border-color:#777;border-radius:0;padding:5mm;break-inside:avoid;}
-      h1{font-size:24px;margin-bottom:8px;}
-      .section-title{font-size:18px;}
-      th,td{border-width:1px;padding:4px 5px;}
-      td{height:28px;min-height:28px;}
-      .purpose-body{min-height:90px;}
-      .purpose-body textarea{min-height:72px;}
-      .cards{grid-template-columns:repeat(5, 1fr);}
-      .card{padding:6px 8px;border-radius:8px;}
-      .card .value{font-size:16px;}
+      .print-page{width:100%;height:198mm;box-sizing:border-box;overflow:hidden;}
+      .print-page-one{
+        display:grid;
+        grid-template-columns:40% 60%;
+        grid-template-rows:auto auto minmax(0,1fr);
+        gap:2mm;
+        break-after:page;
+        page-break-after:always;
+      }
+      .print-page-two{
+        display:grid;
+        grid-template-rows:1fr 1fr;
+        gap:2mm;
+        break-before:page;
+        page-break-before:always;
+      }
+      .doc-heading{
+        grid-column:1 / -1;
+        margin:0;
+        padding:1.5mm 3mm;
+        border:0;
+        border-radius:0;
+        box-shadow:none;
+        background:#173d66;
+        color:#fff;
+      }
+      .doc-heading h1{font-size:15pt;line-height:1.05;margin:0 0 .6mm;}
+      .doc-heading .eyebrow{margin:0 0 .5mm;color:#dbe8f4;font-size:5.5pt;letter-spacing:.12em;}
+      .doc-heading .lead{margin:0;color:#fff;font-size:6.5pt;}
+      #basic{grid-column:1;grid-row:2 / 4;}
+      #summary{grid-column:2;grid-row:2;}
+      #standard{grid-column:2;grid-row:3;}
+      .section,.section-panel,.summary-section{margin:0;min-width:0;}
+      .section-panel,.summary-section{
+        padding:2mm;
+        border:0.25mm solid #789;
+        border-radius:0;
+        box-shadow:none;
+        break-inside:avoid;
+      }
+      .section-title{font-size:9.5pt;line-height:1.1;margin:0 0 1mm;}
+      .section-kicker{font-size:5.5pt;margin-bottom:.5mm;}
+      .section-note,.mini-note,.summary-caption,.hint,.import-source-note{font-size:5.5pt;line-height:1.15;}
+      .head-row{grid-template-columns:1fr 1fr;gap:1mm;margin:0 0 1mm;}
+      .top-grid{grid-template-columns:1.05fr .95fr;gap:1mm;margin-top:1mm;}
+      .purpose-box{margin-top:1mm;border-width:.25mm;}
+      .purpose-title{padding:1mm 1.5mm;font-size:7pt;}
+      .purpose-body{min-height:0;padding:1mm 1.5mm;}
+      .purpose-body textarea{min-height:31mm;height:31mm;font-size:6.2pt;line-height:1.25;padding:0;border:0;resize:none;overflow:hidden;}
+      .grid-2{grid-template-columns:1fr;gap:1mm;}
+      .cards{grid-template-columns:repeat(5,1fr);gap:1mm;margin-top:1mm;}
+      .card{padding:1.5mm;border-radius:1mm;}
+      .card .label{font-size:5.4pt;}
+      .card .value{font-size:9pt;margin-top:.5mm;}
+      .coverage-section{min-height:0;display:flex;flex-direction:column;}
+      .coverage-section .table-scroll{flex:none;}
+      .insurer-head{margin-bottom:1mm;}
+      .insurer-head .name{font-size:10pt;}
+      table{border-collapse:collapse;}
+      th,td{border-width:.2mm;padding:.55mm .8mm;line-height:1.1;}
+      td{height:4.2mm;min-height:0;}
+      .mini,.std-table,.scenario-table,.insurer-table{min-width:0;font-size:5.7pt;}
+      .mini th,.mini td,.std-table th,.std-table td,.scenario-table th,.scenario-table td,.insurer-table th,.insurer-table td{padding:.5mm .6mm;}
+      .mini td,.std-table td,.scenario-table td,.insurer-table td{height:4mm;}
+      input,select,textarea{font-size:inherit;line-height:1.1;}
       .date-input{display:none;}
       .date-print{display:inline;}
       .table-scroll,.people-table-wrap{overflow:visible;}
-      .insurer-table,.std-table,.scenario-table,.mini{min-width:0;}
-      select{background-image:none;padding-right:4px;}
+      .black{background:#d9dee4 !important;color:#111;}
+      select{background-image:none;padding-right:.5mm;}
     }
   </style>
 </head>
@@ -304,12 +385,14 @@
             <div class="menu-section">
               <div class="menu-section-title">提案書全体を復元する</div>
               <p class="menu-section-note">以前に保存した提案書全体のJSONファイルを選択します。</p>
-              <div class="import-choices">
-                <div class="import-choice">
-                  <label class="file-btn" for="allJsonInput">提案書全体JSONを読込</label>
-                  <input id="allJsonInput" type="file" accept=".json,application/json" />
+              <div class="json-drop-zone" id="jsonDropZone">
+                <span class="drop-file-mark" aria-hidden="true">JSON</span>
+                <span class="drop-copy">
+                  <strong>JSONファイルをここにドロップ</strong>
                   <span>顧客情報、標準保障額、大同生命・他社の保険明細などをすべて復元します。</span>
-                </div>
+                </span>
+                <label class="file-btn" for="allJsonInput">ファイルを選択</label>
+                <input id="allJsonInput" type="file" accept=".json,application/json" />
               </div>
             </div>
             <div class="menu-section">
@@ -345,6 +428,7 @@
       <a href="#coverage">4 加入状況</a>
     </nav>
 
+    <div class="print-page print-page-one">
     <div class="doc-heading">
       <p class="eyebrow">BUSINESS PROTECTION REVIEW</p>
       <h1>企業防衛提案主意書</h1>
@@ -438,9 +522,15 @@
       </div>
 
       <div class="purpose-box">
-        <div class="purpose-title">主意書の目的</div>
+        <div class="purpose-title">
+          <span>主意書の目的</span>
+          <span class="purpose-title-actions">
+            <span class="purpose-edit-hint" id="purposeEditHint">「編集」を押すと文面を変更できます</span>
+            <button class="purpose-edit-btn" id="purposeEditButton" type="button" aria-controls="purposeText" aria-pressed="false" onclick="togglePurposeEditing()">編集</button>
+          </span>
+        </div>
         <div class="purpose-body">
-          <textarea data-key="purposeText">経営においては、経営者・幹部の万一の場合に備えて、生命保険によるリスク対策が必要です。貴社の対策の現状及び既加入契約の目的を整理し、保険金使途を明確にすることにより過不足なくリスク対策が講じられているかを事務所担当者と一緒にご確認をお願い致します。</textarea>
+          <textarea id="purposeText" data-key="purposeText" aria-label="主意書の目的" readonly>経営においては、経営者・幹部の万一の場合に備えて、生命保険によるリスク対策が必要です。貴社の対策の現状及び既加入契約の目的を整理し、保険金使途を明確にすることにより過不足なくリスク対策が講じられているかを事務所担当者と一緒にご確認をお願い致します。</textarea>
         </div>
       </div>
     </div>
@@ -589,7 +679,10 @@
       </div>
     </section>
 
-    <section class="section section-panel" id="coverage">
+    </div>
+
+    <div class="print-page print-page-two">
+    <section class="section section-panel coverage-section" id="coverage">
       <div class="insurer-head">
         <div class="name">大同生命</div>
         <div class="controls">
@@ -713,7 +806,7 @@
       </div>
     </section>
 
-    <section class="section section-panel">
+    <section class="section section-panel coverage-section other-coverage">
       <div class="insurer-head">
         <div class="name">他社</div>
         <div class="controls">
@@ -832,6 +925,7 @@
       </table>
       </div>
     </section>
+    </div>
 
     <div class="footer-note">
       この版は、クライアントと同じ画面を見ながら「標準保障額」と「既加入保険金額」を比較し、不足額を共有する用途に寄せています。保険金額欄は数字のみ・万単位・リアルタイムコンマ表示です。標準保障額のサンプル値は、添付の標準保障額算定書に対応する値を呼び出せるようにしています。
@@ -1104,9 +1198,38 @@
         alert('読込しました。');
       }catch(e){ alert('読込に失敗しました。'); }
     }
+    function localDateStamp(value){
+      const match = String(value || '').match(/^(\d{4})-(\d{2})-(\d{2})$/);
+      if(match){
+        const year = Number(match[1]);
+        const month = Number(match[2]);
+        const day = Number(match[3]);
+        const date = new Date(year, month - 1, day);
+        if(date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day){
+          return `${match[1]}${match[2]}${match[3]}`;
+        }
+      }
+      const now = new Date();
+      return `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}`;
+    }
+
+    function safeFilenamePart(value){
+      return String(value || '')
+        .trim()
+        .replace(/[\\/:*?"<>|\u0000-\u001f]/g, '_')
+        .replace(/\s+/g, ' ')
+        .replace(/[. ]+$/g, '')
+        .slice(0, 60) || '会社名未入力';
+    }
+
+    function buildAllJsonFilename(data){
+      return `${localDateStamp(data.entryDate)}_${safeFilenamePart(data.clientName)}.json`;
+    }
+
     function downloadAllJson(){
-      const blob = new Blob([JSON.stringify(collectData(), null, 2)], {type:'application/json'});
-      downloadBlob(blob, 'enterprise_defense_form.json');
+      const data = collectData();
+      const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+      downloadBlob(blob, buildAllJsonFilename(data));
     }
 
     function isPlainJsonObject(value){
@@ -1170,9 +1293,42 @@
       URL.revokeObjectURL(url);
     }
 
+    function setPurposeEditing(editing){
+      const box = document.querySelector('.purpose-box');
+      const textarea = document.getElementById('purposeText');
+      const button = document.getElementById('purposeEditButton');
+      const hint = document.getElementById('purposeEditHint');
+      if(!box || !textarea || !button) return;
+      textarea.readOnly = !editing;
+      box.classList.toggle('is-editing', editing);
+      button.textContent = editing ? '編集を完了' : '編集';
+      button.setAttribute('aria-pressed', String(editing));
+      if(hint) hint.textContent = editing ? '文面を編集できます' : '「編集」を押すと文面を変更できます';
+      if(editing) textarea.focus();
+    }
+
+    function togglePurposeEditing(){
+      const textarea = document.getElementById('purposeText');
+      setPurposeEditing(!!textarea?.readOnly);
+    }
+
+    function wirePurposeEditor(){
+      const textarea = document.getElementById('purposeText');
+      if(!textarea) return;
+      textarea.addEventListener('keydown', event => {
+        if(event.key === 'Escape' && !textarea.readOnly){
+          event.preventDefault();
+          setPurposeEditing(false);
+          document.getElementById('purposeEditButton')?.focus();
+        }
+      });
+      setPurposeEditing(false);
+    }
+
     function clearForm(){
       if(!confirm('入力内容を初期化します。よろしいですか？')) return;
       resetDataFields();
+      setPurposeEditing(false);
       setValue('purposeText', DEFAULT_PURPOSE);
       setTodayDate();
       recalcStandard();
@@ -1677,12 +1833,43 @@
 
     function wireJsonInput(){
       const input = document.getElementById('allJsonInput');
-      if(!input) return;
-      input.addEventListener('change', async () => {
-        const file = input.files && input.files[0];
+      const dropZone = document.getElementById('jsonDropZone');
+      if(!input || !dropZone) return;
+      const importFile = async file => {
         if(!file) return;
         await loadAllJsonFile(file);
         input.value = '';
+      };
+      input.addEventListener('change', async () => {
+        const file = input.files && input.files[0];
+        await importFile(file);
+      });
+
+      let dragDepth = 0;
+      dropZone.addEventListener('dragenter', event => {
+        event.preventDefault();
+        dragDepth++;
+        dropZone.classList.add('is-dragover');
+      });
+      dropZone.addEventListener('dragover', event => {
+        event.preventDefault();
+        if(event.dataTransfer) event.dataTransfer.dropEffect = 'copy';
+      });
+      dropZone.addEventListener('dragleave', event => {
+        event.preventDefault();
+        dragDepth = Math.max(0, dragDepth - 1);
+        if(dragDepth === 0) dropZone.classList.remove('is-dragover');
+      });
+      dropZone.addEventListener('drop', async event => {
+        event.preventDefault();
+        dragDepth = 0;
+        dropZone.classList.remove('is-dragover');
+        const files = [...(event.dataTransfer?.files || [])];
+        if(files.length !== 1){
+          alert(files.length > 1 ? 'JSONファイルは1つだけドロップしてください。' : 'JSONファイルをドロップしてください。');
+          return;
+        }
+        await importFile(files[0]);
       });
     }
 
@@ -1698,6 +1885,7 @@
       bindEvents();
       wirePdfInput();
       wireJsonInput();
+      wirePurposeEditor();
       setTodayDate();
       setValue('purposeText', DEFAULT_PURPOSE);
       recalcStandard();

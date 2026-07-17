@@ -1869,21 +1869,77 @@
       return crop;
     }
 
-    async function recognizeAmountCell(worker, canvas, rectangle, key){
-      const processedResult = await worker.recognize(makeAmountOcrCrop(canvas, rectangle, true));
-      const processedValue = cleanOcrAmount(processedResult?.data?.text, key);
-      const processedConfidence = Number(processedResult?.data?.confidence || 0);
-      if(processedValue != null && processedConfidence >= 45) return processedValue;
-
-      const rawResult = await worker.recognize(makeAmountOcrCrop(canvas, rectangle, false));
-      const rawValue = cleanOcrAmount(rawResult?.data?.text, key);
-      const rawConfidence = Number(rawResult?.data?.confidence || 0);
-      if(rawValue != null && (processedValue == null || rawConfidence > processedConfidence)) return rawValue;
-      return processedValue;
+    async function recognizeAmountCellCandidates(worker, canvas, rectangle, key){
+      const candidates = [];
+      for(const thresholded of [true, false]){
+        const result = await worker.recognize(makeAmountOcrCrop(canvas, rectangle, thresholded));
+        const value = cleanOcrAmount(result?.data?.text, key);
+        if(value == null) continue;
+        const confidence = Number(result?.data?.confidence || 0);
+        const existing = candidates.find(candidate => candidate.value === value);
+        if(existing) existing.confidence = Math.max(existing.confidence, confidence);
+        else candidates.push({value, confidence});
+      }
+      return candidates;
     }
 
-    function validateStandardAmounts(rawAmounts){
-      const amounts = {...rawAmounts};
+    function digitEditDistance(left, right){
+      const a = String(left ?? '').replace(/\D/g,'');
+      const b = String(right ?? '').replace(/\D/g,'');
+      const rows = Array.from({length:a.length + 1}, () => Array(b.length + 1).fill(0));
+      for(let i=0;i<=a.length;i++) rows[i][0] = i;
+      for(let j=0;j<=b.length;j++) rows[0][j] = j;
+      for(let i=1;i<=a.length;i++){
+        for(let j=1;j<=b.length;j++){
+          rows[i][j] = Math.min(
+            rows[i - 1][j] + 1,
+            rows[i][j - 1] + 1,
+            rows[i - 1][j - 1] + Number(a[i - 1] !== b[j - 1])
+          );
+        }
+      }
+      return rows[a.length][b.length];
+    }
+
+    function validateStandardAmounts(rawCandidates){
+      const candidates = Object.fromEntries(Object.entries(rawCandidates).map(([key, readings]) => {
+        const normalized = Array.isArray(readings) ? readings : [{value:readings, confidence:0}];
+        const unique = [];
+        normalized.forEach(reading => {
+          const value = cleanOcrAmount(reading?.value ?? reading, key);
+          if(value == null) return;
+          const confidence = Number(reading?.confidence || 0);
+          const existing = unique.find(candidate => candidate.value === value);
+          if(existing) existing.confidence = Math.max(existing.confidence, confidence);
+          else unique.push({value, confidence});
+        });
+        return [key, unique];
+      }));
+      const amounts = {};
+      Object.entries(candidates).forEach(([key, readings]) => {
+        if(readings.length) amounts[key] = [...readings].sort((a,b) => b.confidence - a.confidence)[0].value;
+      });
+      const lockedKeys = new Set();
+      const lockSubtractionResult = (targetKey, leftKey, rightKey) => {
+        const matches = [];
+        for(const left of candidates[leftKey] || []){
+          for(const right of candidates[rightKey] || []){
+            const expected = Number(left.value) - Number(right.value);
+            for(const target of candidates[targetKey] || []){
+              if(Number(target.value) === expected){
+                matches.push({target, score:left.confidence + right.confidence + target.confidence});
+              }
+            }
+          }
+        }
+        if(!matches.length) return;
+        const winner = matches.sort((a,b) => b.score - a.score)[0].target;
+        candidates[targetKey] = [{value:winner.value, confidence:winner.confidence + 500}];
+        amounts[targetKey] = winner.value;
+        lockedKeys.add(targetKey);
+      };
+      lockSubtractionResult('std_8', 'scenario_std_death', 'scenario_std_disability');
+      lockSubtractionResult('check_b', 'check_total', 'check_a');
       const asNumber = key => {
         const value = amounts[key];
         return value == null || value === '' || !Number.isFinite(Number(value)) ? null : Number(value);
@@ -1891,17 +1947,62 @@
       const setDerived = (key, value) => {
         if(Number.isFinite(value)) amounts[key] = String(value);
       };
-      const deriveSingleMissing = (keys, checkKey) => {
-        const missing = keys.filter(key => asNumber(key) == null);
-        if(missing.length !== 1 || asNumber(checkKey) == null) return;
-        const knownTotal = keys.filter(key => key !== missing[0]).reduce((sum,key) => sum + asNumber(key), 0);
-        setDerived(missing[0], asNumber(checkKey) - knownTotal);
+      const resolveSubtotal = (keys, checkKey) => {
+        const checks = candidates[checkKey] || [];
+        if(!checks.length) return;
+        let best = null;
+        const consider = (values, check, repairedKey=null, editDistance=0, repairSignal=0) => {
+          const valueMap = Object.fromEntries(values.map(item => [item.key, Number(item.value)]));
+          if(Number.isFinite(valueMap.std_6) && Number.isFinite(valueMap.std_7)
+            && (valueMap.std_7 < 0 || valueMap.std_7 > Math.ceil(valueMap.std_6 * .3))) return;
+          const confidence = values.reduce((sum,item) => sum + item.confidence, check.confidence);
+          const score = confidence - editDistance * 1000 + repairSignal - Number(repairedKey != null) * 10;
+          if(!best || score > best.score) best = {values, check, score};
+        };
+        const walk = (candidateKeys, index, chosen, callback) => {
+          if(index >= candidateKeys.length){ callback(chosen); return; }
+          const key = candidateKeys[index];
+          for(const candidate of candidates[key] || []){
+            walk(candidateKeys, index + 1, [...chosen, {key, ...candidate}], callback);
+          }
+        };
+
+        walk(keys, 0, [], values => {
+          const sum = values.reduce((total,item) => total + Number(item.value), 0);
+          checks.forEach(check => {
+            if(sum === Number(check.value)) consider(values, check);
+          });
+        });
+
+        if(!best){
+          keys.filter(key => !lockedKeys.has(key)).forEach(repairedKey => {
+            const otherKeys = keys.filter(key => key !== repairedKey);
+            walk(otherKeys, 0, [], values => {
+              const knownTotal = values.reduce((total,item) => total + Number(item.value), 0);
+              checks.forEach(check => {
+                const derived = Number(check.value) - knownTotal;
+                if(!Number.isFinite(derived) || (repairedKey === 'std_4' ? derived > 0 : derived < 0)) return;
+                const originals = candidates[repairedKey] || [];
+                const distance = originals.length
+                  ? Math.min(...originals.map(candidate => digitEditDistance(candidate.value, derived)))
+                  : 0;
+                if(distance > 4) return;
+                const repairSignal = originals.length === 0 ? 5000 : Math.max(0, originals.length - 1) * 2500;
+                consider([...values, {key:repairedKey, value:String(derived), confidence:0}], check, repairedKey, distance, repairSignal);
+              });
+            });
+          });
+        }
+
+        if(!best) return;
+        best.values.forEach(item => { amounts[item.key] = item.value; });
+        amounts[checkKey] = best.check.value;
       };
 
       const subtotalAKeys = ['std_1','std_2','std_3','std_4','std_5'];
       const subtotalBKeys = ['std_6','std_7','std_8'];
-      deriveSingleMissing(subtotalAKeys, 'check_a');
-      deriveSingleMissing(subtotalBKeys, 'check_b');
+      resolveSubtotal(subtotalAKeys, 'check_a');
+      resolveSubtotal(subtotalBKeys, 'check_b');
 
       const baseKeys = [...subtotalAKeys, ...subtotalBKeys, 'scenario_std_critical'];
       const missing = baseKeys.filter(key => asNumber(key) == null);
@@ -1954,27 +2055,33 @@
           }
         }
       });
-      const extracted = {};
+      const extractedCandidates = {};
       try{
-        await worker.setParameters({
-          tessedit_char_whitelist:'0123456789,.-',
-          tessedit_pageseg_mode:'7',
-          preserve_interword_spaces:'1',
-        });
         const rectangles = standardAmountRectangles(canvas);
-        for(let i=0;i<rectangles.length;i++){
-          const [key, rectangle] = rectangles[i];
-          setOcrStatus(`金額欄を画像OCRしています… ${i + 1}/${rectangles.length}`, true);
-          const value = await recognizeAmountCell(worker, canvas, rectangle, key);
-          if(value != null) extracted[key] = value;
+        const pageSegModes = ['13','7'];
+        let progress = 0;
+        for(const pageSegMode of pageSegModes){
+          await worker.setParameters({
+            tessedit_char_whitelist:'0123456789,.-',
+            tessedit_pageseg_mode:pageSegMode,
+            preserve_interword_spaces:'1',
+          });
+          for(const [key, rectangle] of rectangles){
+            progress += 1;
+            setOcrStatus(`金額欄を画像OCRしています… ${progress}/${rectangles.length * pageSegModes.length}`, true);
+            const readings = await recognizeAmountCellCandidates(worker, canvas, rectangle, key);
+            if(!extractedCandidates[key]) extractedCandidates[key] = [];
+            readings.forEach(reading => {
+              const existing = extractedCandidates[key].find(candidate => candidate.value === reading.value);
+              if(existing) existing.confidence = Math.max(existing.confidence, reading.confidence);
+              else extractedCandidates[key].push(reading);
+            });
+          }
         }
       }finally{
         await worker.terminate();
       }
-      const allOtherAmountsRead = ['std_1','std_2','std_3','std_4','std_5','std_6','std_8','scenario_std_death','scenario_std_disability','scenario_std_critical']
-        .every(key => extracted[key] != null);
-      if(allOtherAmountsRead && extracted.std_7 == null) extracted.std_7 = '0';
-      return {amounts:validateStandardAmounts(extracted), pageText:selectedPage.pageText, pageNumber:selectedPage.pageNumber};
+      return {amounts:validateStandardAmounts(extractedCandidates), pageText:selectedPage.pageText, pageNumber:selectedPage.pageNumber};
     }
 
     function applyStdExtractedValues(extracted){
@@ -2070,6 +2177,22 @@
       });
     }
 
+    function wireMoreActionsDismiss(){
+      const details = document.querySelector('.more-actions');
+      const summary = details?.querySelector('summary');
+      if(!details || !summary) return;
+      document.addEventListener('click', event => {
+        if(details.open && event.target instanceof Node && !details.contains(event.target)){
+          details.open = false;
+        }
+      });
+      document.addEventListener('keydown', event => {
+        if(event.key !== 'Escape' || !details.open) return;
+        details.open = false;
+        summary.focus();
+      });
+    }
+
     function init(){
       populateSelectors();
       const fieldLabels = {
@@ -2082,6 +2205,7 @@
       bindEvents();
       wirePdfInput();
       wireJsonInput();
+      wireMoreActionsDismiss();
       wirePurposeEditor();
       setTodayDate();
       setValue('purposeText', DEFAULT_PURPOSE);

@@ -319,7 +319,14 @@
       .doc-heading h1{font-size:15pt;line-height:1.05;margin:0 0 .6mm;}
       .doc-heading .eyebrow{margin:0 0 .5mm;color:#dbe8f4;font-size:5.5pt;letter-spacing:.12em;}
       .doc-heading .lead{margin:0;color:#fff;font-size:6.5pt;}
-      #basic{grid-column:1;grid-row:2 / 4;}
+      #basic{
+        grid-column:1;
+        grid-row:2 / 4;
+        display:flex;
+        flex-direction:column;
+        min-height:0;
+        padding:2.5mm;
+      }
       #summary{grid-column:2;grid-row:2;}
       #standard{grid-column:2;grid-row:3;}
       .section,.section-panel,.summary-section{margin:0;min-width:0;}
@@ -333,12 +340,92 @@
       .section-title{font-size:9.5pt;line-height:1.1;margin:0 0 1mm;}
       .section-kicker{font-size:5.5pt;margin-bottom:.5mm;}
       .section-note,.mini-note,.summary-caption,.hint,.import-source-note{font-size:5.5pt;line-height:1.15;}
-      .head-row{grid-template-columns:1fr 1fr;gap:1mm;margin:0 0 1mm;}
-      .top-grid{grid-template-columns:1.05fr .95fr;gap:1mm;margin-top:1mm;}
-      .purpose-box{margin-top:1mm;border-width:.25mm;}
-      .purpose-title{padding:1mm 1.5mm;font-size:7pt;}
-      .purpose-body{min-height:0;padding:1mm 1.5mm;}
-      .purpose-body textarea{min-height:31mm;height:31mm;font-size:6.2pt;line-height:1.25;padding:0;border:0;resize:none;overflow:hidden;}
+      #basic .section-kicker{margin:0 0 .5mm;}
+      #basic .panel-title{
+        margin:0 0 1.5mm;
+        padding:0 0 1mm;
+        border-bottom:.25mm solid #cbd5e1;
+        font-size:10.5pt;
+        line-height:1.15;
+      }
+      #basic .head-row{display:block;margin:0;}
+      #basic .line-field{min-width:0;gap:1.5mm;}
+      #basic .line-field .label,#basic .field-label{font-size:6.2pt;white-space:nowrap;}
+      #basic .line-field .line{min-height:5.5mm;}
+      #basic .meta-box{
+        display:grid;
+        grid-template-columns:auto minmax(0,1fr);
+        align-items:center;
+        justify-content:stretch;
+        gap:3mm;
+        width:100%;
+        margin-top:1mm;
+        padding:0;
+      }
+      #basic .date-row,#basic .person-row{
+        justify-content:flex-start;
+        min-width:0;
+        min-height:5.5mm;
+        margin:0;
+        gap:1mm;
+        white-space:nowrap;
+      }
+      #basic .date-print{white-space:nowrap;}
+      #basic .inline-line.long{width:auto;min-width:0;flex:1;}
+      #basic .top-grid{
+        display:flex;
+        flex:1 1 auto;
+        flex-direction:column;
+        min-height:0;
+        gap:0;
+        margin-top:1.5mm;
+      }
+      #basic .people-tables{flex:0 0 auto;}
+      #basic .mini{width:100%;font-size:6.2pt;}
+      #basic .mini th{height:7mm;padding:.6mm 1mm;line-height:1.15;}
+      #basic .mini td{height:5.5mm;padding:.4mm 1mm;}
+      #basic .mini.attendee-table{margin-top:1.2mm;}
+      #basic .mini td input,#basic .mini td select{
+        min-height:0;
+        padding:0 .5mm;
+        border:0;
+        border-radius:0;
+        box-shadow:none;
+        background:transparent;
+      }
+      #basic .purpose-box{
+        display:grid;
+        grid-template-rows:auto minmax(0,1fr);
+        flex:0 0 58mm;
+        width:100%;
+        min-height:58mm;
+        margin-top:auto;
+        border:.25mm solid #9eabb8;
+        border-left:1.2mm solid #4f6f8c;
+        border-radius:1mm;
+        background:#f8fafc;
+      }
+      #basic .purpose-title{
+        padding:1.2mm 2mm;
+        border-bottom:.2mm solid #cbd5e1;
+        background:#edf2f7;
+        color:#263849;
+        font-size:7pt;
+      }
+      #basic .purpose-body{display:flex;min-height:0;padding:1.5mm 2mm;}
+      #basic .purpose-body textarea{
+        flex:1;
+        width:100%;
+        height:100%;
+        min-height:0;
+        padding:0;
+        border:0;
+        background:transparent;
+        font-size:6.3pt;
+        line-height:1.35;
+        resize:none;
+        overflow:hidden;
+      }
       .grid-2{grid-template-columns:1fr;gap:1mm;}
       .cards{grid-template-columns:repeat(5,1fr);gap:1mm;margin-top:1mm;}
       .card{padding:1.5mm;border-radius:1mm;}
@@ -1669,28 +1756,6 @@
       const dateMatch = normalized.match(/作成日:?\s*(\d{4})年\s*(\d{1,2})月\s*(\d{1,2})日/);
       if(dateMatch) extracted.entryDate = `${dateMatch[1]}-${dateMatch[2].padStart(2,'0')}-${dateMatch[3].padStart(2,'0')}`;
 
-      const baseMap = [
-        ['std_1', /(?:1|①)\s*運転資金\s*[+＋]\s*固定費|運転資金\s*[+＋]\s*固定費/],
-        ['std_2', /(?:2|②)\s*借入金返済資金|借入金返済資金/],
-        ['std_3', /(?:3|③)\s*その他\s*の?\s*負債|その他\s*の?\s*負債/],
-        ['std_4', /(?:4|④)\s*現金化可能\s*な?\s*資産|現金化可能\s*な?\s*資産/],
-        ['std_5', /(?:5|⑤)\s*納税準備資金|納税準備資金/],
-        ['std_6', /(?:6|⑥)\s*役員退職慰労金|役員退職慰労金/],
-        ['std_7', /(?:7|⑦)\s*功労加算金|功労加算金/],
-        ['std_8', /(?:8|⑧)\s*弔慰金|弔慰金/],
-      ];
-      for(const [key, rx] of baseMap){
-        const n = cleanNumberString(findNumberNear(rx, normalized, 180));
-        if(n != null && n !== '') extracted[key] = n;
-      }
-
-      const scenarioStart = normalized.search(/[ⅠI1]\s*標準保障額\s*[\[\[]?[AＡ]\s*[+＋]\s*[BＢ]/);
-      if(scenarioStart >= 0){
-        const scenarioValues = extractMoneyValues(normalized.slice(scenarioStart, scenarioStart + 320));
-        if(scenarioValues[0] != null) extracted.scenario_std_death = scenarioValues[0];
-        if(scenarioValues[1] != null) extracted.scenario_std_disability = scenarioValues[1];
-        if(scenarioValues[2] != null) extracted.scenario_std_critical = scenarioValues[2];
-      }
       return extracted;
     }
 
@@ -1714,9 +1779,12 @@
         ['std_3', rect(480,285,150,35)],
         ['std_4', rect(520,340,110,35)],
         ['std_5', rect(480,395,150,35)],
+        ['check_a', rect(480,450,150,35)],
         ['std_6', rect(480,505,150,35)],
         ['std_7', rect(560,560,70,35)],
         ['std_8', rect(480,615,150,35)],
+        ['check_b', rect(480,670,150,35)],
+        ['check_total', rect(480,725,150,35)],
         ['scenario_std_death', rect(330,813,104,35)],
         ['scenario_std_disability', rect(466,813,104,35)],
         ['scenario_std_critical', rect(604,813,104,35)],
@@ -1724,13 +1792,141 @@
     }
 
     function cleanOcrAmount(text, key){
-      const normalized = String(text || '').normalize('NFKC');
-      const digits = normalized.replace(/[^0-9-]/g,'');
-      if(!/\d/.test(digits)) return null;
-      let value = String(Number(digits));
+      const normalized = String(text || '')
+        .normalize('NFKC')
+        .replace(/[△▲]/g,'-')
+        .trim();
+      if(!/^-?\s*(?:\d+|\d{1,3}(?:[,\.\s]\d{3})+)\s*$/.test(normalized)) return null;
+      const negative = /^-/.test(normalized);
+      const digits = normalized.replace(/\D/g,'');
+      if(!digits) return null;
+      let value = String(Number(`${negative ? '-' : ''}${digits}`));
       if(!Number.isFinite(Number(value))) return null;
       if(key === 'std_4' && Number(value) > 0) value = `-${value}`;
       return value;
+    }
+
+    function standardAmountPageScore(text){
+      const normalized = normalizeOcrText(text);
+      const weightedTerms = [
+        ['標準保障額算定書', 12],
+        ['運転資金', 3],
+        ['借入金返済資金', 3],
+        ['その他の負債', 2],
+        ['現金化可能な資産', 2],
+        ['納税準備資金', 2],
+        ['役員退職慰労金', 3],
+        ['弔慰金', 2],
+        ['標準保障額', 3],
+      ];
+      return weightedTerms.reduce((score, [term, weight]) => score + (normalized.includes(term) ? weight : 0), 0);
+    }
+
+    async function findStandardAmountPage(pdf){
+      const candidates = [];
+      for(let pageNumber=1;pageNumber<=pdf.numPages;pageNumber++){
+        let pageText = '';
+        try{
+          const page = await pdf.getPage(pageNumber);
+          const textContent = await page.getTextContent();
+          pageText = normalizeOcrText((textContent.items || []).map(item => item.str || '').join(' '));
+        }catch(error){
+          console.warn(`PDF ${pageNumber}ページ目の文字情報を取得できませんでした。`, error);
+        }
+        candidates.push({pageNumber, pageText, score:standardAmountPageScore(pageText)});
+      }
+      const ranked = [...candidates].sort((a,b) => b.score - a.score || Number(b.pageNumber === 3) - Number(a.pageNumber === 3) || a.pageNumber - b.pageNumber);
+      if(ranked[0]?.score > 0) return ranked[0];
+      return candidates[Math.min(2, candidates.length - 1)] || {pageNumber:1, pageText:'', score:0};
+    }
+
+    function makeAmountOcrCrop(sourceCanvas, rectangle, thresholded=true){
+      const scale = 2;
+      const crop = document.createElement('canvas');
+      crop.width = Math.max(1, rectangle.width * scale);
+      crop.height = Math.max(1, rectangle.height * scale);
+      const ctx = crop.getContext('2d', {willReadFrequently:true});
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(0, 0, crop.width, crop.height);
+      ctx.imageSmoothingEnabled = true;
+      ctx.drawImage(
+        sourceCanvas,
+        rectangle.left, rectangle.top, rectangle.width, rectangle.height,
+        0, 0, crop.width, crop.height
+      );
+      if(thresholded){
+        const image = ctx.getImageData(0, 0, crop.width, crop.height);
+        for(let i=0;i<image.data.length;i+=4){
+          const gray = image.data[i] * .299 + image.data[i + 1] * .587 + image.data[i + 2] * .114;
+          const value = gray < 190 ? 0 : 255;
+          image.data[i] = value;
+          image.data[i + 1] = value;
+          image.data[i + 2] = value;
+          image.data[i + 3] = 255;
+        }
+        ctx.putImageData(image, 0, 0);
+      }
+      return crop;
+    }
+
+    async function recognizeAmountCell(worker, canvas, rectangle, key){
+      const processedResult = await worker.recognize(makeAmountOcrCrop(canvas, rectangle, true));
+      const processedValue = cleanOcrAmount(processedResult?.data?.text, key);
+      const processedConfidence = Number(processedResult?.data?.confidence || 0);
+      if(processedValue != null && processedConfidence >= 45) return processedValue;
+
+      const rawResult = await worker.recognize(makeAmountOcrCrop(canvas, rectangle, false));
+      const rawValue = cleanOcrAmount(rawResult?.data?.text, key);
+      const rawConfidence = Number(rawResult?.data?.confidence || 0);
+      if(rawValue != null && (processedValue == null || rawConfidence > processedConfidence)) return rawValue;
+      return processedValue;
+    }
+
+    function validateStandardAmounts(rawAmounts){
+      const amounts = {...rawAmounts};
+      const asNumber = key => {
+        const value = amounts[key];
+        return value == null || value === '' || !Number.isFinite(Number(value)) ? null : Number(value);
+      };
+      const setDerived = (key, value) => {
+        if(Number.isFinite(value)) amounts[key] = String(value);
+      };
+      const deriveSingleMissing = (keys, checkKey) => {
+        const missing = keys.filter(key => asNumber(key) == null);
+        if(missing.length !== 1 || asNumber(checkKey) == null) return;
+        const knownTotal = keys.filter(key => key !== missing[0]).reduce((sum,key) => sum + asNumber(key), 0);
+        setDerived(missing[0], asNumber(checkKey) - knownTotal);
+      };
+
+      const subtotalAKeys = ['std_1','std_2','std_3','std_4','std_5'];
+      const subtotalBKeys = ['std_6','std_7','std_8'];
+      deriveSingleMissing(subtotalAKeys, 'check_a');
+      deriveSingleMissing(subtotalBKeys, 'check_b');
+
+      const baseKeys = [...subtotalAKeys, ...subtotalBKeys, 'scenario_std_critical'];
+      const missing = baseKeys.filter(key => asNumber(key) == null);
+      if(missing.length){
+        throw new Error(`次の金額欄を読み取れませんでした: ${missing.join(', ')}`);
+      }
+
+      const subtotalA = subtotalAKeys.reduce((sum,key) => sum + asNumber(key), 0);
+      const subtotalB = subtotalBKeys.reduce((sum,key) => sum + asNumber(key), 0);
+      const total = subtotalA + subtotalB;
+      const issues = [];
+      if(asNumber('check_a') != null && asNumber('check_a') !== subtotalA) issues.push('企業防衛準備資金A');
+      if(asNumber('check_b') != null && asNumber('check_b') !== subtotalB) issues.push('役員退職慰労金準備資金B');
+      if(issues.length){
+        throw new Error(`OCR結果の検算が一致しませんでした: ${issues.join('、')}`);
+      }
+
+      setDerived('scenario_std_death', total);
+      setDerived('scenario_std_disability', total - asNumber('std_8'));
+      if(asNumber('check_total') != null && asNumber('check_total') !== total){
+        console.warn('標準保障額合計欄のOCR値を小計から再計算しました。', amounts.check_total, total);
+      }
+
+      const requiredKeys = [...subtotalAKeys, ...subtotalBKeys, 'scenario_std_death','scenario_std_disability','scenario_std_critical'];
+      return Object.fromEntries(requiredKeys.map(key => [key, amounts[key]]));
     }
 
     async function extractAmountsFromStandardPdfOCR(file){
@@ -1741,8 +1937,10 @@
       const data = new Uint8Array(await file.arrayBuffer());
       const pdf = await pdfjs.getDocument({data}).promise;
       const TesseractLib = await loadTesseractLib();
-      const page = await pdf.getPage(1);
-      const viewport = page.getViewport({scale:4});
+      const selectedPage = await findStandardAmountPage(pdf);
+      setOcrStatus(`標準保障額表を${selectedPage.pageNumber}ページ目から読み取っています…`, true);
+      const page = await pdf.getPage(selectedPage.pageNumber);
+      const viewport = page.getViewport({scale:4.5});
       const canvas = document.createElement('canvas');
       canvas.width = Math.floor(viewport.width);
       canvas.height = Math.floor(viewport.height);
@@ -1761,13 +1959,13 @@
         await worker.setParameters({
           tessedit_char_whitelist:'0123456789,.-',
           tessedit_pageseg_mode:'7',
+          preserve_interword_spaces:'1',
         });
         const rectangles = standardAmountRectangles(canvas);
         for(let i=0;i<rectangles.length;i++){
           const [key, rectangle] = rectangles[i];
           setOcrStatus(`金額欄を画像OCRしています… ${i + 1}/${rectangles.length}`, true);
-          const result = await worker.recognize(canvas, {rectangle});
-          const value = cleanOcrAmount(result?.data?.text, key);
+          const value = await recognizeAmountCell(worker, canvas, rectangle, key);
           if(value != null) extracted[key] = value;
         }
       }finally{
@@ -1776,7 +1974,7 @@
       const allOtherAmountsRead = ['std_1','std_2','std_3','std_4','std_5','std_6','std_8','scenario_std_death','scenario_std_disability','scenario_std_critical']
         .every(key => extracted[key] != null);
       if(allOtherAmountsRead && extracted.std_7 == null) extracted.std_7 = '0';
-      return extracted;
+      return {amounts:validateStandardAmounts(extracted), pageText:selectedPage.pageText, pageNumber:selectedPage.pageNumber};
     }
 
     function applyStdExtractedValues(extracted){
@@ -1801,10 +1999,8 @@
         setOcrStatus('PDFの埋込文字を解析しています…', true);
         const embeddedText = await extractTextFromPdfOffline(file);
         let extracted = extractStandardFields(embeddedText);
-        if(extractedCoverageCount(extracted) < 9){
-          const ocrAmounts = await extractAmountsFromStandardPdfOCR(file);
-          extracted = {...extracted, ...ocrAmounts};
-        }
+        const ocrResult = await extractAmountsFromStandardPdfOCR(file);
+        extracted = {...extracted, ...extractStandardFields(ocrResult.pageText), ...ocrResult.amounts};
 
         const appliedKeys = applyStdExtractedValues(extracted);
         if(extractedCoverageCount(extracted) < 8){
@@ -1812,10 +2008,11 @@
           setOcrStatus('抽出失敗', false);
           return;
         }
-        setOcrStatus(`反映完了: ${appliedKeys.length}項目（必ず金額をご確認ください）`, false);
+        setOcrStatus(`反映完了: ${ocrResult.pageNumber}ページ目から${appliedKeys.length}項目（必ず金額をご確認ください）`, false);
       }catch(err){
         console.error(err);
-        alert('PDF読込中にエラーが発生しました。\n\n画像OCRには初回のみネット接続が必要です。接続状況を確認して、もう一度お試しください。');
+        const detail = err?.message ? `\n\n${err.message}` : '';
+        alert(`PDF読込中にエラーが発生しました。${detail}\n\n金額は反映していません。PDFの対象ページと記載内容をご確認ください。画像OCRには初回のみネット接続が必要です。`);
         setOcrStatus('PDF読込エラー', false);
       }
     }
